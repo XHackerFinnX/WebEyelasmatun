@@ -2,6 +2,8 @@ fastapi
 uvicorn
 sqlalchemy
 aiosqlite
+psycopg2-binary
+pika
 Jinja2
 python-multipart
 pydantic_settings

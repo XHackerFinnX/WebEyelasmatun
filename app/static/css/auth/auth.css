@@ -1,0 +1,113 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #FFFCF7;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #FFFFFF;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+}
+
+.title {
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    color: #9E8C6C;
+    margin-bottom: 2rem;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+input[type="text"],
+input[type="password"] {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #F0E6D2;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: #FFFEFA;
+}
+
+button {
+    background-color: #cab69b;
+    color: #6E5C3E;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+button:hover {
+    background-color: #D9C8B0;
+    transform: translateY(-2px);
+}
+
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #9E8C6C;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+}
+
+.remember-me input {
+    margin-right: 0.5rem;
+}
+
+.forgot-password {
+    color: #B8A88A;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    color: #9E8C6C;
+    text-decoration: underline;
+}
+
+.error-popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #FFE6E6;
+    color: #CC5555;
+    padding: 1rem;
+    border-radius: 4px;
+    display: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .form-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .remember-me {
+        margin-bottom: 0.5rem;
+    }
+}

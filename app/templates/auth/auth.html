@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eyelasmatun - Авторизация</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/auth/auth.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Eyelasmatun</h1>
+        <form id="loginForm" class="login-form">
+            <input type="text" id="username" placeholder="Логин" required>
+            <input type="password" id="password" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+            <div class="form-footer">
+                <label class="remember-me">
+                    <input type="checkbox" id="rememberMe">
+                    <span>Запомнить меня</span>
+                </label>
+                <a href="https://t.me/Eyelasmatun_bot" class="forgot-password">Не помню пароль</a>
+            </div>
+        </form>
+    </div>
+    <div id="errorPopup" class="error-popup">
+        <p>Неправильный логин или пароль</p>
+    </div>
+    <script src="/static/js/auth/auth.js"></script>
+</body>
+</html>
+

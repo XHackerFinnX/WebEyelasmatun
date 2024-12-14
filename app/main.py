@@ -6,6 +6,8 @@ from config.config import config
 
 from routers.auth_rout import router as router_auth
 from routers.main_rout import router as router_main
+from routers.admin_rout import router as router_admin
+from routers.user_rout import router as router_user
 
 
 app = FastAPI(
@@ -35,3 +37,5 @@ app.add_middleware(
 
 app.include_router(router_auth)
 app.include_router(router_main)
+app.include_router(router_admin)
+app.include_router(router_user)

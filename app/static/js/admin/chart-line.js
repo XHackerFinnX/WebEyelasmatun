@@ -23,8 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="appointment-time">${appointment.time}</div>
             <div class="appointment-details">
                 <div class="client-name">${appointment.clientName}</div>
-                <div class="telegram-username">${appointment.telegramUsername}</div>
-                <div class="appointment-comment">${appointment.comment}</div>
+                <div class="tg-container">
+                    <div class="tgtext">ТГ:</div>
+                    <div class="telegram-username">${appointment.telegramUsername}</div>
+                </div>
+                <div class="comment-container">
+                    <div class="commtext">Комментарий:</div>
+                    <div class="appointment-comment">${appointment.comment}</div>
+                </div>
             </div>
         `;
         return appointmentElement;
@@ -60,9 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve([
-                    { time: '10:00', clientName: 'Анна Иванова', telegramUsername: '@anna_iv', comment: 'Первый визит' },
-                    { time: '11:30', clientName: 'Петр Сидоров', telegramUsername: '@petr_s', comment: 'Коррекция' },
-                    { time: '14:00', clientName: 'Мария Петрова', telegramUsername: '@maria_p', comment: 'Снятие' },
+                    {id: 1, time: '10:00', clientName: 'Анна Иванова', telegramUsername: '@anna_iv', comment: 'Небольшие, короткие, мини, легкие тексты для чтения со школьниками. Детские тексты, тексты с простыми словами, любые тексты для детей.\nСтраницы отсортированы по длине текста. под индексом 1 - идут самые короткие тексты, под индексом 40 - длинные тексты.' },
+                    {id: 2, time: '11:30', clientName: 'Петр Сидоров', telegramUsername: '@petr_s', comment: 'Коррекция' },
+                    {id: 3, time: '14:00', clientName: 'Мария Петрова', telegramUsername: '@maria_p', comment: 'Снятие' },
                 ]);
             }, 500);
         });

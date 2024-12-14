@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eyelasmatun - Админ панель</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="/static/css/admin/admin.css">
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="nav-button nav-button-left">Записаться</a>
+            <a href="/profile/{{user}}" class="nav-button nav-button-center">Админ панель</a>
+            <a href="/pricelist" class="nav-button nav-button-right">Прайс-лист</a>
+        </nav>
+    </header>
+
+    <main class="admin-panel">
+        <div class="tile-container">
+            <div class="tile" id="assign-day">
+                <i class="fas fa-calendar-plus"></i>
+                <span>Назначить день</span>
+            </div>
+            <div class="tile" id="remove-day">
+                <i class="fas fa-calendar-minus"></i>
+                <span>Убрать день</span>
+            </div>
+            <div class="tile" id="view-schedule">
+                <i class="fas fa-chart-line"></i>
+                <span>Посмотреть график</span>
+            </div>
+            <div class="tile" id="send-message">
+                <i class="fas fa-comment-alt"></i>
+                <span>Отправить сообщение в лс</span>
+            </div>
+            <div class="tile" id="send-broadcast">
+                <i class="fas fa-mail-bulk"></i>
+                <span>Рассылка</span>
+            </div>
+            <div class="tile" id="add-to-blacklist">
+                <i class="fas fa-user-slash"></i>
+                <span>Добавить в ЧС</span>
+            </div>
+            <div class="tile" id="remove-from-blacklist">
+                <i class="fas fa-user-check"></i>
+                <span>Убрать из ЧС</span>
+            </div>
+            <div class="tile" id="view-blacklist">
+                <i class="fas fa-user-times"></i>
+                <span>Посмотреть клиентов в ЧС</span>
+            </div>
+            <div class="tile" id="delete-appointment">
+                <i class="fas fa-calendar-times"></i>
+                <span>Удалить запись клиента</span>
+            </div>
+            <div class="tile" id="view-clients">
+                <i class="fas fa-users"></i>
+                <span>Список клиентов</span>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
+    <script src="/static/js/admin/admin.js"></script>
+</body>
+</html>

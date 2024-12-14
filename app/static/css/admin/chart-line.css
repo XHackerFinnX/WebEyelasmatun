@@ -183,44 +183,63 @@ nav {
 .appointment-item:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+/* ---------- */
+/* Update existing styles and add new ones */
+
+.appointment-item {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--tile-hover-color);
+    border-radius: 4px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
 
 .appointment-time {
     font-weight: bold;
-    min-width: 60px;
+    font-size: 25px;
+    margin-bottom: 0.5rem;
+    color: var(--button-color);
 }
 
-.appointment-details {
-    flex-grow: 1;
+.appointment-content {
+    display: flex;
+    flex-direction: column;
 }
 
 .client-name {
     font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-size: 18px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+.tg-container, .comment-container {
+    display: flex;
+    align-items: flex-start;
     margin-bottom: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.tgtext, .commtext {
+    font-weight: bold;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
 }
 
 .telegram-username {
     color: #1e88e5;
-    margin-bottom: 0.25rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
 }
 
 .appointment-comment {
     font-style: italic;
     color: #666;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
 }
-
-/* Responsive design */
-@media (max-width: 600px) {
-    .appointment-chart {
-        margin: 1rem;
-        padding: 1rem;
-    }
-
-    .appointment-item {
-        flex-direction: column;
-    }
-
-    .appointment-time {
-        margin-bottom: 0.5rem;
-    }
-}
-

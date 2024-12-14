@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eyelasmatun - Мой профиль</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="/static/css/user/user.css">
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="nav-button nav-button-left">Записаться</a>
+            <a href="/profile/{{user}}" class="nav-button nav-button-center">Мой профиль</a>
+            <a href="/pricelist" class="nav-button nav-button-right">Прайс-лист</a>
+        </nav>
+    </header>
+
+    <main class="profile-container">
+        <h1>Мой профиль</h1>
+        <div class="profile-info">
+    <div class="profile-field user-id-field">
+        <label>ID:</label>
+        <span id="userId">{{ id_user }}</span>
+    </div>
+    <div class="profile-field">
+        <label>Имя:</label>
+        <div class="input-button-container">
+            <input type="text" id="userName" value={{name_user}} readonly>
+            <button class="edit-button" data-field="userName"><i class="fas fa-pencil-alt"></i></button>
+        </div>
+    </div>
+    <div class="profile-field">
+        <label>ТГ:</label>
+        <div class="input-button-container">
+            <input type="text" id="userTg" value={{tg_user}} readonly>
+            <button class="edit-button" data-field="userTg"><i class="fas fa-pencil-alt"></i></button>
+        </div>
+    </div>
+    <div class="profile-field">
+        <label>Номер телефона:</label>
+        <div class="input-button-container">
+            <input type="tel" id="userPhone" value={{number_user}} readonly>
+            <button class="edit-button" data-field="userPhone"><i class="fas fa-pencil-alt"></i></button>
+        </div>
+    </div>
+        <button id="logoutButton" class="logout-button">Выйти</button>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
+    <script src="/static/js/user/user.js"></script>
+</body>
+</html>
+

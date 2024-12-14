@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Записаться к Eyelasmatun</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="/static/css/main/main.css">
+    <link rel="stylesheet" href="/static/css/main/modal_time.css">
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="nav-button nav-button-left">Записаться</a>
+            {% if admin_or_user == 'admin'%}
+            <a href="/profile/{{user}}" class="nav-button nav-button-center">Админ панель</a>
+            {% else %}
+            <a href="/profile/{{user}}" class="nav-button nav-button-center">Мой профиль</a>
+            {% endif %}
+            <a href="/pricelist" class="nav-button nav-button-right">Прайс-лист</a>
+        </nav>
+    </header>
+    <main>
+        <div id="calendar"></div>
+        <button id="book-button" disabled>Выбрать время</button>
+    </main>
+    <div id="errorPopup" class="error-popup">
+        <p>На эту дату нет записи</p>
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="modal-close" id="closeModal" style="margin-top: 0px;padding-right: 0px;padding-top: 0px;">&times;</button>
+            <h2 class="modal-title">Выберите время</h2>
+            <textarea class="comment-box" placeholder="Добавьте комментарий..."></textarea>
+            <button class="submit-button" id="submitButton">Записаться</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
+    <script src="/static/js/main/main.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eyelasmatun - Прайс-лист</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="/static/css/main/pricel.css">
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="nav-button nav-button-left">Записаться</a>
+            {% if admin_or_user == 'admin'%}
+            <a href="/profile/{{user}}" class="nav-button nav-button-center">Админ панель</a>
+            {% else %}
+            <a href="/profile/{{user}}" class="nav-button nav-button-center">Мой профиль</a>
+            {% endif %}
+            <a href="/pricelist" class="nav-button nav-button-right">Прайс-лист</a>
+        </nav>
+    </header>
+
+    <p>Прайс-лист</p>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
+</body>
+</html>
+

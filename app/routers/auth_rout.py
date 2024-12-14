@@ -37,18 +37,17 @@ async def post_login(request: Request, data: LoginData):
 @router.get("/auth", response_class=HTMLResponse)
 async def get_auth(request: Request):
     
-
     return templates.TemplateResponse("auth.html", {"request": request})
 
 
-@router.get("/logout", response_class=HTMLResponse)
+@router.post("/logout", response_class=HTMLResponse)
 async def logout(request: Request):
     
     user = request.session.get('login')
 
     if user:
         request.session.clear()  # Очистка сессии
-        return templates.TemplateResponse("auth.html", {"request": request})
+        return JSONResponse(content={'status': True})
     else:
         return templates.TemplateResponse("auth.html", {"request": request})
     

@@ -1,0 +1,121 @@
+:root {
+    --primary-color: #f3e5d8;
+    --secondary-color: #e6d0b8;
+    --text-color: #4a4a4a;
+    --button-color: #d4a977;
+    --selected-button-color: #97683e;
+}
+
+/* Основные стили */
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: var(--secondary-color);
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.modal-title {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.time-button {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    background-color: var(--button-color);
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    margin: 10px auto;
+    width: 100%;
+    max-width: 150px;
+    cursor: pointer;
+    font-size: 16px;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+.time-button.selected {
+    background-color: var(--selected-button-color);
+}
+
+.time-button .icon {
+    margin-right: 23px;
+    border-right: 1px solid white;
+    padding-right: 10px;
+}
+
+.comment-box {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 14px;
+    resize: none;
+    overflow: hidden;
+}
+
+.submit-button {
+    margin-top: 20px;
+    background-color: var(--button-color);
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 300px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.submit-button:focus {
+    outline: none;
+    border: none;
+}
+
+.time-button:focus {
+    outline: none;
+    border: none;
+}
+

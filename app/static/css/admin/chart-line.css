@@ -1,0 +1,226 @@
+:root {
+    --primary-color: #f3e5d8;
+    --secondary-color: #e6d0b8;
+    --text-color: #4a4a4a;
+    --button-color: #d4a977;
+    --tile-color: #ffffff;
+    --tile-hover-color: #f9f1e7;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: var(--secondary-color);
+    padding: 1rem;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.nav-button {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 11px 11px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    background-color: var(--button-color);
+    color: white;
+    text-align: center;
+    max-width: 200px;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.nav-button:hover {
+    background-color: #c49665;
+}
+
+.nav-button i {
+    font-size: 1.2rem;
+}
+
+/* Styles for the AppointmentChart component */
+.appointment-chart {
+    max-width: 600px;
+    margin: 2rem auto;
+    background-color: var(--tile-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.date-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+.date-display {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    background-color: #ffffff;
+    cursor: pointer;
+    padding: 0.7rem 1rem;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    color: var(--text-color);
+    width: 150px;
+}
+
+.date-display:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.date-display:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--button-color);
+}
+
+/* Flatpickr custom styles */
+.flatpickr-calendar {
+    background-color: var(--tile-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    border: none;
+    padding: 1rem;
+    width: 340px;
+    position: absolute; /* Keep this */
+}
+
+/* Add this new class for custom positioning */
+.flatpickr-calendar.custom-position {
+    top: var(--calendar-top);
+    left: var(--calendar-left);
+    right: var(--calendar-right);
+}
+
+.flatpickr-day {
+    border-radius: 4px;
+    color: var(--text-color);
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.inRange,
+.flatpickr-day.startRange.inRange,
+.flatpickr-day.endRange.inRange,
+.flatpickr-day.selected:focus,
+.flatpickr-day.startRange:focus,
+.flatpickr-day.endRange:focus,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover,
+.flatpickr-day.selected.prevMonthDay,
+.flatpickr-day.startRange.prevMonthDay,
+.flatpickr-day.endRange.prevMonthDay,
+.flatpickr-day.selected.nextMonthDay,
+.flatpickr-day.startRange.nextMonthDay,
+.flatpickr-day.endRange.nextMonthDay {
+    background: var(--button-color);
+    border-color: var(--button-color);
+}
+
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+    fill: var(--text-color);
+}
+
+
+.day-of-week {
+    text-align: center;
+    font-size: 21px;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    text-transform: capitalize;
+}
+
+.appointments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.appointment-item {
+    display: flex;
+    background-color: var(--tile-hover-color);
+    border-radius: 4px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.appointment-item:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-time {
+    font-weight: bold;
+    min-width: 60px;
+}
+
+.appointment-details {
+    flex-grow: 1;
+}
+
+.client-name {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.telegram-username {
+    color: #1e88e5;
+    margin-bottom: 0.25rem;
+}
+
+.appointment-comment {
+    font-style: italic;
+    color: #666;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .appointment-chart {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .appointment-item {
+        flex-direction: column;
+    }
+
+    .appointment-time {
+        margin-bottom: 0.5rem;
+    }
+}
+

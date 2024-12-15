@@ -48,3 +48,231 @@ nav {
 .nav-button:hover {
     background-color: #c49665;
 }
+
+#searchInput {
+    width: 93%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+}
+
+#clientList {
+    list-style-type: none;
+    padding: 0;
+}
+
+.client-item {
+    background-color: var(--tile-color);
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.client-item:hover {
+    background-color: var(--tile-hover-color);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: var(--tile-color);
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-button {
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    flex: 1;
+    max-width: 150px;
+}
+
+.modal-button:hover {
+    background-color: #c49665;
+}
+
+#clientInfo {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+#clientInfo p {
+    margin: 10px 0;
+}
+
+#blacklistStatus {
+    font-weight: bold;
+}
+
+#historyTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#historyTable th, #historyTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#historyTable th {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+#historyTable tr:nth-child(even) {
+    background-color: var(--tile-hover-color);
+}
+
+#historyTable tr:hover {
+    background-color: #ddd;
+}
+
+.sortable {
+    cursor: pointer;
+}
+
+.sortable i {
+    margin-left: 5px;
+}
+
+#historyTable td:last-child {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#historyTable td:last-child:hover {
+    white-space: normal;
+    overflow: visible;
+}
+
+/* Стили для адаптивности на мобильных устройствах */
+@media screen and (max-width: 600px) {
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 10px;
+    }
+
+    #historyTable {
+        font-size: 14px;
+    }
+
+    #historyTable th, #historyTable td {
+        padding: 6px 4px;
+    }
+
+    #historyTable td:last-child {
+        max-width: 150px;
+    }
+
+    /* Изменение отображения таблицы для мобильных устройств */
+    #historyTable, #historyTable thead, #historyTable tbody, #historyTable th, #historyTable td, #historyTable tr {
+        display: block;
+    }
+
+    #historyTable thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    #historyTable tr {
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+    }
+
+    #historyTable td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        white-space: normal;
+        text-align: left;
+    }
+
+    #historyTable td:before {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+    }
+
+    #historyTable td:nth-of-type(1):before { content: "Дата"; }
+    #historyTable td:nth-of-type(2):before { content: "Время"; }
+    #historyTable td:nth-of-type(3):before { content: "Комментарий"; }
+
+    #historyTable td:last-child {
+        max-width: none;
+        white-space: normal;
+        overflow: visible;
+    }
+
+    /* Стили для кнопок сортировки */
+    .sort-buttons {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 10px;
+    }
+
+    .sort-button {
+        background-color: var(--button-color);
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .sort-button:hover {
+        background-color: #c49665;
+    }
+
+    .sort-button.active {
+        background-color: #c49665;
+    }
+}
+

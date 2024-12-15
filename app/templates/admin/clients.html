@@ -16,8 +16,59 @@
         </nav>
     </header>
 
+    <div class="container">
+        <header>
+            <input type="text" id="searchInput" placeholder="Поиск по ID, имени, телеграму или телефону">
+        </header>
+        <main>
+            <ul id="clientList"></ul>
+        </main>
+
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <h3 style="margin-top: 5px; text-align: center;"><span id="clientId"></span></h3>
+                <div id="clientInfo">
+                    <p>Последний визит на сайт: <span id="lastVisit"></span></p>
+                    <p>Последняя запись: <span id="lastAppointment"></span></p>
+                    <p>Количество посещений: <span id="visitCount"></span></p>
+                    <p>Количество отмен: <span id="cancelCount"></span></p>
+                    <p>Статус ЧС: <span id="blacklistStatus"></span></p>
+                    <p id="locationInfo" style="display: none;">IP-адрес: <span id="ipAddress"></span>, Страна: <span id="country"></span>, Город: <span id="city"></span></p>
+                </div>
+                <div class="button-container">
+                    <button id="historyButton" class="modal-button">История посещений</button>
+                    <button id="closeButton" class="modal-button">Закрыть</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="historyModal" class="modal">
+            <div class="modal-content">
+                <div class="sort-buttons">
+                    <button class="sort-button" data-sort="date">Сортировать по дате</button>
+                    <button class="sort-button" data-sort="time">Сортировать по времени</button>
+                </div>
+                <h3 style="margin-top: 5px; text-align: center;">История посещений</h3>
+                <table id="historyTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-sort="date">Дата <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="time">Время <i class="fas fa-sort"></i></th>
+                            <th>Комментарий</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
+                <div class="button-container">
+                    <button id="closeHistoryButton" class="modal-button">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
     <script src="/static/js/admin/clients.js"></script>
 </body>
 </html>
+

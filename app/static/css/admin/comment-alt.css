@@ -48,3 +48,85 @@ nav {
 .nav-button:hover {
     background-color: #c49665;
 }
+
+#searchInput {
+    width: 93%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+}
+
+#clientList {
+    list-style-type: none;
+    padding: 0;
+}
+
+.client-item {
+    background-color: var(--tile-color);
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.client-item:hover {
+    background-color: var(--tile-hover-color);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: var(--tile-color);
+    margin: 60% auto;
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+}
+
+#messageInput {
+    width: 93%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 4px;
+    resize: none;
+    font-size: 16px;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+#sendButton {
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+#sendButton:hover {
+    background-color: #c49665;
+}

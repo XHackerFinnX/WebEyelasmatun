@@ -16,6 +16,23 @@
         </nav>
     </header>
 
+    <div class="container">
+        <header>
+            <input type="text" id="searchInput" placeholder="Поиск по ID">
+        </header>
+        <main>
+            <ul id="clientList"></ul>
+        </main>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top: 5px;"><span id="clientId"></span></h3>
+            <textarea id="messageInput" rows="4" cols="50"></textarea>
+            <button id="sendButton">Отправить</button>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
     <script src="/static/js/admin/comment-alt.js"></script>

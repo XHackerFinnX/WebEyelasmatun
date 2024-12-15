@@ -45,9 +45,6 @@ async function handleTileClick(event) {
         case 'remove-from-blacklist':
             endpoint = `update/remove-from-blacklist/${id_user}`;
             break;
-        case 'view-blacklist':
-            endpoint = `update/view-blacklist/${id_user}`;
-            break;
         case 'delete-appointment':
             endpoint = `update/delete-appointment/${id_user}`;
             break;

@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="appointment-time">${appointment.time}</div>
             <div class="appointment-details">
                 <div class="client-name">${appointment.clientName}</div>
+                <div class="id-name">ID: ${appointment.id}</div>
                 <div class="tg-container">
                     <div class="tgtext">ТГ:</div>
                     <div class="telegram-username">${appointment.telegramUsername}</div>

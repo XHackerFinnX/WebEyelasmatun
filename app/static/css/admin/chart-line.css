@@ -216,6 +216,11 @@ nav {
     max-width: 100%;
 }
 
+.id-name {
+    font-weight: bold;
+    font-size: 17px;
+}
+
 .tg-container, .comment-container {
     display: flex;
     align-items: flex-start;

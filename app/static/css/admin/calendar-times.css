@@ -5,10 +5,11 @@
     --button-color: #d4a977;
     --tile-color: #ffffff;
     --tile-hover-color: #f9f1e7;
+    --accent-color: #c49665;
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', Arial, sans-serif;
     background-color: var(--primary-color);
     color: var(--text-color);
     margin: 0;
@@ -16,35 +17,306 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    line-height: 1.6;
 }
 
 header {
     background-color: var(--secondary-color);
     padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 nav {
     display: flex;
-    flex-direction: row;
     justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
 }
 
 .nav-button {
-    color: var(--text-color);
+    color: white;
     text-decoration: none;
     font-size: 1rem;
-    padding: 11px 11px;
-    border-radius: 4px;
+    padding: 0.7rem 1.5rem;
+    border-radius: 25px;
     transition: all 0.3s ease;
     background-color: var(--button-color);
-    color: white;
     text-align: center;
     max-width: 200px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
 .nav-button:hover {
-    background-color: #c49665;
+    background-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+main {
+    flex-grow: 1;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.search-container {
+    margin-bottom: 2rem;
+}
+
+#searchInput {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--secondary-color);
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+#searchInput:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(196, 150, 101, 0.2);
+}
+
+.clients-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.client-card {
+    background-color: var(--tile-color);
+    border-radius: 12px;
+    padding: 1.2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.client-card:hover {
+    background-color: var(--tile-hover-color);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.client-card h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 1.1rem;
+    color: var(--accent-color);
+}
+
+.client-card p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--tile-color);
+    margin: 5% auto;
+    padding: 1.5rem;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    box-sizing: border-box;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover,
+.close:focus {
+    color: var(--accent-color);
+}
+
+.appointment {
+    background-color: var(--secondary-color);
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.appointment:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-date-time {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 0.3rem;
+}
+
+.appointment-comment {
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.delete-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #d9534f;
+    transition: all 0.3s ease;
+    padding: 0.3rem;
+    border-radius: 50%;
+}
+
+.delete-btn:hover {
+    color: #c9302c;
+    background-color: rgba(217, 83, 79, 0.1);
+}
+
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0,0,0,.3);
+    border-radius: 50%;
+    border-top-color: #000;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 1rem;
+    }
+
+    .clients-list {
+        grid-template-columns: 1fr;
+    }
+
+    .client-card {
+        padding: 10px;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+        padding: 1.5rem;
+    }
+
+    .appointment {
+        flex-direction: column;
+    }
+
+    .appointment-info {
+        margin-bottom: 1rem;
+    }
+
+    .delete-btn {
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-button {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    #searchInput {
+        padding: 0.7rem 0.9rem;
+        font-size: 0.9rem;
+    }
+
+    .client-card h3 {
+        font-size: 1rem;
+    }
+
+    .client-card p {
+        font-size: 0.8rem;
+    }
+
+    .appointment-date-time {
+        font-size: 0.9rem;
+    }
+
+    .appointment-comment {
+        font-size: 0.8rem;
+    }
+
+    .modal-content {
+        margin: 2% auto;
+        padding: 1rem;
+        width: 95%;
+        max-width: 95%;
+    }
+
+    .modal-content h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .appointment {
+        padding-top: 0.8rem;
+        padding-right: 0.8rem;
+        padding-bottom: 0.1rem;
+        padding-left: 0.8rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .delete-btn {
+        font-size: 0.9rem;
+        padding: 0.2rem;
+    }
+
+    .close {
+        font-size: 24px;
+    }
+}
+
+.client-label {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.client-value {
+    font-size: 1.05rem;
+}
+
+@media (max-width: 480px) {
+    .client-label {
+        font-size: 1rem;
+    }
+
+    .client-value {
+        font-size: 0.95rem;
+    }
 }

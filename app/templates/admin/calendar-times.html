@@ -8,13 +8,29 @@
     <link rel="stylesheet" href="/static/css/admin/calendar-times.css">
     <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
         <nav>
-            <a href="/profile/{{user}}" class="nav-button nav-button-center">Назад</a>
+            <a href="/profile/{{user}}" class="nav-button">Назад</a>
         </nav>
     </header>
+    <main>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Поиск клиентов...">
+        </div>
+        <div class="clients-list" id="clientsList">
+            <!-- Клиенты будут добавлены здесь динамически -->
+        </div>
+    </main>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Записи клиента</h2>
+            <div id="clientAppointments"></div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>

@@ -142,7 +142,113 @@ nav {
     font-weight: normal;
 }
 
+.modal {
+    display: none; /* Изначально скрыто */
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6); /* Полупрозрачный фон */
+}
 
+.modal-content {
+    background-color: var(--primary-color); /* Основной цвет интерфейса */
+    color: var(--text-color); /* Цвет текста */
+    margin: 5% auto; /* Центрирование */
+    padding: 2rem;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px; /* Максимальная ширина */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тень */
+    animation: fadeIn 0.3s ease-in-out; /* Анимация появления */
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.appointment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.appointment-info p {
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+}
+
+/* Кнопка удаления записи */
+.delete-btn {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+    background-color: #e60000;
+}
+
+.delete-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Закрывающий крестик */
+.modal-close {
+    position: absolute;
+    top: 25px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+    color: #ff4d4d;
+}
+
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
 
 @media (max-width: 600px) {
     .profile-container {
@@ -240,3 +346,19 @@ nav {
     }
 }
 
+.appointments-button {
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.appointments-button:hover {
+    background-color: #c49665;
+}

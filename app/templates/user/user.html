@@ -46,12 +46,21 @@
             <button class="edit-button" data-field="userPhone"><i class="fas fa-pencil-alt"></i></button>
         </div>
     </div>
+        <button id="myAppointmentsBtn" class="appointments-button">Мои записи</button>
         <button id="logoutButton" class="logout-button">Выйти</button>
     </main>
+
+    <div id="appointmentsModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalCloseButton">&times;</button>
+            <h2>Мои записи</h2>
+            <h3 id="downolad-record">Загрузка записей...</h3>
+            <div id="appointmentsList"></div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
     <script src="/static/js/user/user.js"></script>
 </body>
 </html>
-

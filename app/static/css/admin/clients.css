@@ -185,6 +185,10 @@ nav {
     overflow: visible;
 }
 
+.sort-button {
+    display: none;
+}
+
 /* Стили для адаптивности на мобильных устройствах */
 @media screen and (max-width: 600px) {
     .modal-content {
@@ -265,6 +269,7 @@ nav {
         padding: 5px 10px;
         border-radius: 4px;
         cursor: pointer;
+        display: block;
     }
 
     .sort-button:hover {

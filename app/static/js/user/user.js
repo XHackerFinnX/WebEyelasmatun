@@ -26,7 +26,8 @@ window.addEventListener('click', function(event) {
 async function loadAppointments() {
     try {
         console.log('Загрузка записей...');
-        downloadRecord.style.display = 'block';
+        appointmentsList.innerHTML = '<p class="loading-message">Загрузка записей...</p>';
+        
         // Имитируем задержку, как будто данные приходят с сервера
         await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -34,11 +35,11 @@ async function loadAppointments() {
         appointmentsList.innerHTML = mockAppointments.map(appointment => `
             <div class="appointment-item" data-id="${appointment.id}">
                 <div class="appointment-info">
-                    <p>Дата: ${appointment.date}</p>
-                    <p>Время: ${appointment.time}</p>
-                    <p>Комментарий: ${appointment.comment}</p>
+                    <p><strong>Дата:</strong> ${appointment.date}</p>
+                    <p><strong>Время:</strong> ${appointment.time}</p>
+                    <p><strong>Комментарий:</strong> ${appointment.comment}</p>
                 </div>
-                <button class="delete-btn" data-id="${appointment.id}">
+                <button class="delete-btn" data-id="${appointment.id}" title="Удалить запись">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
@@ -50,9 +51,9 @@ async function loadAppointments() {
         });
 
         console.log('Записи успешно загружены.');
-        downloadRecord.style.display = 'none';
     } catch (error) {
         console.error('Ошибка загрузки записей:', error);
+        appointmentsList.innerHTML = '<p class="error-message">Ошибка при загрузке записей. Пожалуйста, попробуйте позже.</p>';
     }
 }
 

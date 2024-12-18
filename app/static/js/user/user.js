@@ -1,3 +1,5 @@
+let isLoading = false;
+
 const myAppointmentsBtn = document.getElementById('myAppointmentsBtn');
 const appointmentsModal = document.getElementById('appointmentsModal');
 const appointmentsList = document.getElementById('appointmentsList');
@@ -18,7 +20,9 @@ myAppointmentsBtn.addEventListener('click', async function() {
 
 window.addEventListener('click', function(event) {
     if (event.target === appointmentsModal) {
-        appointmentsModal.style.display = 'none';
+        if (!isLoading) {
+            appointmentsModal.style.display = 'none';
+        }
     }
 });
 
@@ -27,6 +31,16 @@ async function loadAppointments() {
     try {
         console.log('Загрузка записей...');
         appointmentsList.innerHTML = '<p class="loading-message">Загрузка записей...</p>';
+        
+        // Устанавливаем флаг загрузки
+        isLoading = true;
+        
+        // Отключаем кнопку "Мои записи" и кнопку закрытия во время загрузки
+        myAppointmentsBtn.disabled = true;
+        modalCloseButton.disabled = true;
+        
+        // Добавляем класс для блокировки закрытия модального окна
+        appointmentsModal.classList.add('loading');
         
         // Имитируем задержку, как будто данные приходят с сервера
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -54,6 +68,16 @@ async function loadAppointments() {
     } catch (error) {
         console.error('Ошибка загрузки записей:', error);
         appointmentsList.innerHTML = '<p class="error-message">Ошибка при загрузке записей. Пожалуйста, попробуйте позже.</p>';
+    } finally {
+        // Сбрасываем флаг загрузки
+        isLoading = false;
+        
+        // Включаем кнопку "Мои записи" и кнопку закрытия после загрузки
+        myAppointmentsBtn.disabled = false;
+        modalCloseButton.disabled = false;
+        
+        // Удаляем класс для разблокировки закрытия модального окна
+        appointmentsModal.classList.remove('loading');
     }
 }
 
@@ -61,10 +85,11 @@ async function loadAppointments() {
 async function deleteAppointment(event) {
     const btn = event.currentTarget;
     const appointmentId = btn.dataset.id;
+    const appointmentItem = btn.closest('.appointment-item');
 
-    // Имитируем изменение интерфейса
-    btn.disabled = true;
+    // Заменяем иконку корзины на индикатор загрузки
     btn.innerHTML = '<div class="loading"></div>';
+    btn.disabled = true;
 
     try {
         console.log(`Удаление записи с ID: ${appointmentId}`);
@@ -75,7 +100,7 @@ async function deleteAppointment(event) {
         const index = mockAppointments.findIndex(app => app.id === Number(appointmentId));
         if (index !== -1) {
             mockAppointments.splice(index, 1);
-            btn.closest('.appointment-item').remove();
+            appointmentItem.remove();
             console.log(`Запись с ID: ${appointmentId} успешно удалена.`);
         } else {
             throw new Error('Запись не найдена');
@@ -83,9 +108,9 @@ async function deleteAppointment(event) {
     } catch (error) {
         console.error('Ошибка при удалении записи:', error);
         alert('Не удалось удалить запись. Попробуйте позже.');
-    } finally {
-        btn.disabled = false;
+        // Возвращаем иконку корзины в случае ошибки
         btn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        btn.disabled = false;
     }
 }
 
@@ -159,6 +184,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // Закрытие модального окна по крестику
 const modalCloseButton = document.getElementById('modalCloseButton');
 modalCloseButton.addEventListener('click', function () {
-    appointmentsModal.style.display = 'none';
+    if (!isLoading) {
+        appointmentsModal.style.display = 'none';
+    }
 });
 

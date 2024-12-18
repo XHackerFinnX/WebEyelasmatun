@@ -154,6 +154,10 @@ nav {
     background-color: rgba(0, 0, 0, 0.6);
 }
 
+.modal.loading {
+    pointer-events: none;
+}
+
 .modal-content {
     background-color: var(--primary-color);
     color: var(--text-color);
@@ -164,6 +168,10 @@ nav {
     max-width: 500px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal.loading .modal-content {
+    opacity: 0.7;
 }
 
 .modal-header {
@@ -193,6 +201,11 @@ nav {
 
 .modal-close:hover {
     color: #ff4d4d;
+}
+
+.modal-close:disabled {
+    color: #cccccc;
+    cursor: not-allowed;
 }
 
 .modal-body {
@@ -230,6 +243,11 @@ nav {
     font-size: 1rem;
     cursor: pointer;
     transition: color 0.3s ease;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .delete-btn:hover {
@@ -241,10 +259,54 @@ nav {
     cursor: not-allowed;
 }
 
-/* Кнопка удаления записи */
+.delete-btn .loading {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #ff4d4d;
+    animation: spin 1s linear infinite;
+}
 
+.appointment-item.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
 
-/* Закрывающий крестик */
+.appointment-item.loading .delete-btn {
+    display: none;
+}
+
+.appointment-item.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--button-color);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.loading-message {
+    text-align: center;
+    padding: 1rem;
+    font-style: italic;
+}
+
+.error-message {
+    text-align: center;
+    padding: 1rem;
+    color: #ff4d4d;
+}
 
 
 .loading {
@@ -384,4 +446,3 @@ nav {
 .appointments-button:hover {
     background-color: #c49665;
 }
-

@@ -18,6 +18,8 @@ body {
     flex-direction: column;
     min-height: 100vh;
     line-height: 1.6;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 header {

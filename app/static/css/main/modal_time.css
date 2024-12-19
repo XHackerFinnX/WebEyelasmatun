@@ -11,6 +11,8 @@ body {
     font-family: Arial, sans-serif;
     background-color: var(--primary-color);
     color: var(--text-color);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .modal-overlay {

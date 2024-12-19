@@ -14,11 +14,8 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-}
-
-header {
-    background-color: var(--secondary-color);
-    padding: 1rem;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 nav {
@@ -102,69 +99,89 @@ button:disabled {
 .error-popup p {
     margin-bottom: 15px;
 }
+/* Add these styles at the end of the file */
 
-@media (max-width: 386px) {
-    .nav-button {
-        padding: 11px 10px;
-    }
+header {
+    position: relative;
 }
 
-@media (max-width: 380px) {
-    .nav-button {
-        padding: 11px 9px;
-    }
+.menu-icon {
+    position: fixed;
+    top: 20px;
+    left: 20px; /* Changed from right to left */
+    font-size: 30px; /* Increased from 24px */
+    cursor: pointer;
+    z-index: 1000;
+    background-color: var(--button-color);
+    color: white;
+    width: 50px; /* Increased from 40px */
+    height: 50px; /* Increased from 40px */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Added subtle shadow */
 }
 
-@media (max-width: 374px) {
-    .nav-button {
-        padding: 11px 8px;
-    }
+.menu-icon:hover {
+    background-color: #c49665;
 }
 
-@media (max-width: 368px) {
-    .nav-button {
-        padding: 11px 7px;
-    }
+.dropdown-menu {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100vh;
+    background-color: var(--secondary-color);
+    transition: left 0.3s ease;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    padding-top: 80px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 362px) {
-    .nav-button {
-        padding: 11px 6px;
-    }
+.dropdown-menu.active {
+    left: 0;
 }
 
-@media (max-width: 356px) {
-    .nav-button {
-        padding: 11px 5px;
-    }
+.dropdown-item {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 15px 20px;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    margin: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
 }
 
-@media (max-width: 350px) {
-    .nav-button {
-        padding: 11px 4px;
-    }
+.dropdown-item:hover {
+    background-color: var(--button-color);
+    color: white;
+    border-color: var(--button-color);
 }
 
-@media (max-width: 344px) {
-    .nav-button {
-        padding: 11px 3px;
-    }
+.dropdown-item i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
 }
 
-@media (max-width: 338px) {
-    .nav-button {
-        padding: 11px 2px;
-    }
+.logout {
+    margin-top: auto;
+    margin-bottom: 20px;
+    background-color: #ff6b6b;
+    color: white;
+    border-color: #ff6b6b;
 }
 
-@media (max-width: 332px) {
-    .nav-button {
-        padding: 11px 1px;
-    }
+.logout:hover {
+    background-color: #ff4757;
+    border-color: #ff4757;
 }
 
-@media (max-width: 326px) {
-    .nav-button {
-        padding: 11px 0.1px;
-    }
-}

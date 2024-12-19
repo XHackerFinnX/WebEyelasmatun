@@ -14,8 +14,6 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 nav {
@@ -461,4 +459,19 @@ header {
 .logout:hover {
     background-color: #ff4757;
     border-color: #ff4757;
+}
+
+button {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+a {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.menu-icon {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }

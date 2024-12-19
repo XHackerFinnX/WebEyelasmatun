@@ -11,8 +11,6 @@ body {
     font-family: Arial, sans-serif;
     background-color: var(--primary-color);
     color: var(--text-color);
-    -webkit-tap-highlight-color: transparent;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .modal-overlay {
@@ -119,5 +117,20 @@ body {
 .time-button:focus {
     outline: none;
     border: none;
+}
+
+button {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+a {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.menu-icon {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 

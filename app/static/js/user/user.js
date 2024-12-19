@@ -3,7 +3,8 @@ let isLoading = false;
 const myAppointmentsBtn = document.getElementById('myAppointmentsBtn');
 const appointmentsModal = document.getElementById('appointmentsModal');
 const appointmentsList = document.getElementById('appointmentsList');
-const downloadRecord = document.getElementById('downolad-record')
+const downloadRecord = document.getElementById('downolad-record');
+const menuList = document.getElementById('menuIcon');
 
 
 // Тестовые данные для имитации записей
@@ -15,6 +16,7 @@ const mockAppointments = [
 
 myAppointmentsBtn.addEventListener('click', async function() {
     appointmentsModal.style.display = 'block';
+    menuList.style.display = 'none';
     await loadAppointments();
 });
 
@@ -22,6 +24,7 @@ window.addEventListener('click', function(event) {
     if (event.target === appointmentsModal) {
         if (!isLoading) {
             appointmentsModal.style.display = 'none';
+            menuList.style.display = 'flex';
         }
     }
 });
@@ -186,6 +189,7 @@ const modalCloseButton = document.getElementById('modalCloseButton');
 modalCloseButton.addEventListener('click', function () {
     if (!isLoading) {
         appointmentsModal.style.display = 'none';
+        menuList.style.display = 'flex';
     }
 });
 

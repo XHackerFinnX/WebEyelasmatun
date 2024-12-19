@@ -8,17 +8,26 @@
     <link rel="stylesheet" href="/static/css/main/main.css">
     <link rel="stylesheet" href="/static/css/main/modal_time.css">
     <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header>
         <nav>
-            <a href="/" class="nav-button nav-button-left">Записаться</a>
-            {% if admin_or_user == 'admin'%}
-            <a href="/profile/{{user}}" class="nav-button nav-button-center">Админ панель</a>
-            {% else %}
-            <a href="/profile/{{user}}" class="nav-button nav-button-center">Мой профиль</a>
-            {% endif %}
-            <a href="/pricelist" class="nav-button nav-button-right">Прайс-лист</a>
+            <div class="menu-icon" id="menuIcon">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="/" class="dropdown-item"><i class="fas fa-calendar-plus"></i> Записаться</a>
+                {% if admin_or_user == 'admin'%}
+                <a href="/profile/{{user}}" class="dropdown-item"><i class="fas fa-user-cog"></i> Админ панель</a>
+                {% else %}
+                <a href="/profile/{{user}}" class="dropdown-item"><i class="fas fa-user"></i> Мой профиль</a>
+                {% endif %}
+                <a href="/pricelist" class="dropdown-item"><i class="fas fa-tags"></i> Прайс-лист</a>
+                <a href="#" class="dropdown-item"><i class="fas fa-star"></i> Отзывы</a>
+                <a href="#" class="dropdown-item"><i class="fas fa-envelope"></i> Контакты</a>
+                <a href="#" id="logoutButton" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+            </div>
         </nav>
     </header>
     <main>

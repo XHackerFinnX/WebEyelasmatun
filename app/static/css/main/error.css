@@ -14,13 +14,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-
-header {
-    background-color: var(--secondary-color);
-    padding: 1rem;
+    margin-top: 200px;
 }
 
 nav {

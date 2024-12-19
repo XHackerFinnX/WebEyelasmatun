@@ -104,7 +104,7 @@ function closeModal() {
 // Open history modal
 async function openHistoryModal() {
     const clientId = clientIdSpan.textContent.split(' ')[1];
-    const history = await fetchVisitHistory(clientId);
+    history = await fetchVisitHistory(clientId);
     populateHistoryTable(history);
     historyModal.style.display = 'block';
 }
@@ -120,11 +120,13 @@ async function fetchVisitHistory(clientId) {
     return new Promise(resolve => {
         setTimeout(() => {
             resolve([
-                { date: '11.11.2024', time: '14:30', dayOfWeek: 'Четверг', comment: 'Стандартная процедура' },
-                { date: '14.11.2024', time: '11:00', dayOfWeek: 'Суббота', comment: 'Клиент опоздал на 15 минут' }, 
-                { date: '18.11.2024', time: '16:45', dayOfWeek: 'Воскресенье', comment: 'Дополнительная услуга: окрашивание' }, 
-                { date: '12.12.2024', time: '10:15', dayOfWeek: 'Понедельник', comment: 'Первое посещение, консультация' }, 
-                { date: '15.12.2024', time: '13:00', dayOfWeek: 'Вторник', comment: 'Отменен клиентом в последний момент' },
+                { date: '11.11.2024', time: '14:30', dayOfWeek: 'Четверг', comment: 'Стандартная процедура', money: 1500 },
+                { date: '14.11.2024', time: '11:00', dayOfWeek: 'Суббота', comment: 'Клиент опоздал на 15 минут', money: 1800 },
+                { date: '18.11.2024', time: '16:45', dayOfWeek: 'Воскресенье', comment: 'Дополнительная услуга: окрашивание', money: 2500 },
+                { date: '12.12.2024', time: '10:15', dayOfWeek: 'Понедельник', comment: 'Первое посещение, консультация', money: 1000 },
+                { date: '15.12.2024', time: '13:00', dayOfWeek: 'Вторник', comment: 'Отменен клиентом в последний момент', money: 0 },
+                { date: '15.12.2024', time: '13:00', dayOfWeek: 'Вторник', comment: 'Отменен клиентом в последний момент', money: 0 },
+                { date: '15.12.2024', time: '13:00', dayOfWeek: 'Вторник', comment: 'Отменен клиентом в последний момент', money: 0 },
             ]);
         }, 500);
     });
@@ -133,14 +135,45 @@ async function fetchVisitHistory(clientId) {
 // Populate history table
 function populateHistoryTable(history) {
     historyTableBody.innerHTML = '';
-    history.forEach(visit => {
+    const clientId = clientIdSpan.textContent.split(' ')[1];
+    history.forEach((visit, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td data-label="Дата">${visit.date} (${visit.dayOfWeek})</td>
             <td data-label="Время">${visit.time}</td>
-            <td data-label="Комментарий">${visit.comment}</td>
+            <td data-label="Комментарий" contenteditable="true">${visit.comment}</td>
+            <td data-label="Деньги" contenteditable="true">${visit.money}</td>
         `;
+        row.dataset.index = index;
+        row.dataset.clientId = clientId;
         historyTableBody.appendChild(row);
+    });
+
+    // Add event listeners for editing
+    historyTableBody.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
+        cell.addEventListener('blur', handleCellEdit);
+    });
+}
+
+// Handle cell edits
+function handleCellEdit(event) {
+    const cell = event.target;
+    const row = cell.closest('tr');
+    const index = parseInt(row.dataset.index);
+    const clientId = row.dataset.clientId;
+    const field = cell.getAttribute('data-label');
+    const newValue = cell.textContent.trim();
+
+    // Update the data
+    const updatedVisit = { ...history[index], [field.toLowerCase()]: newValue };
+    history[index] = updatedVisit;
+
+    // Log the change to the console
+    console.log(`Изменение в записи:`, {
+        clientId: clientId,
+        date: updatedVisit.date,
+        time: updatedVisit.time,
+        [field]: newValue
     });
 }
 
@@ -159,6 +192,10 @@ function sortHistoryTable(column) {
             aValue = parseDate(aValue);
             bValue = parseDate(bValue);
             return (aValue - bValue) * multiplier;
+        } else if (column === 'money') {
+            aValue = parseFloat(a.querySelector('td[data-label="Деньги"]').textContent);
+            bValue = parseFloat(b.querySelector('td[data-label="Деньги"]').textContent);
+            return (aValue - bValue) * multiplier;
         } else {
             aValue = a.querySelector(`td[data-label="${column === 'date' ? 'Дата' : 'Время'}"]`).textContent;
             bValue = b.querySelector(`td[data-label="${column === 'date' ? 'Дата' : 'Время'}"]`).textContent;
@@ -168,11 +205,11 @@ function sortHistoryTable(column) {
 
     rows.forEach(row => historyTableBody.appendChild(row));
 
-    // Update active sort button
-    document.querySelectorAll('.sort-button').forEach(button => {
-        button.classList.remove('active');
-        if (button.dataset.sort === column) {
-            button.classList.add('active');
+    // Update active sort icon
+    document.querySelectorAll('.sort-icon').forEach(icon => {
+        icon.classList.remove('active');
+        if (icon.dataset.sort === column) {
+            icon.classList.add('active');
         }
     });
 }
@@ -189,15 +226,27 @@ closeButton.addEventListener('click', closeModal);
 historyButton.addEventListener('click', openHistoryModal);
 closeHistoryButton.addEventListener('click', closeHistoryModal);
 
-// Sort event listeners
-document.querySelectorAll('.sortable, .sort-button').forEach(el => {
-    el.addEventListener('click', () => {
-        const column = el.dataset.sort;
-        sortHistoryTable(column);
+document.addEventListener('DOMContentLoaded', function() {
+    const sortableElements = [
+        document.getElementById('sortDate'),
+        document.getElementById('sortTime'),
+        document.getElementById('sortMoney'),
+        document.getElementById('dateHeader'),
+        document.getElementById('timeHeader'),
+        document.getElementById('moneyHeader')
+    ];
+
+    sortableElements.forEach(el => {
+        if (el) {
+            el.addEventListener('click', () => {
+                const column = el.dataset.sort;
+                sortHistoryTable(column);
+            });
+        }
     });
 });
 
-// Close modals when clicking outside
+
 window.onclick = function(event) {
     if (event.target == modal) {
         closeModal();
@@ -209,3 +258,39 @@ window.onclick = function(event) {
 // Initial population of client list
 populateClientList(clients);
 
+let history = [];
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sortIcons = document.querySelectorAll('.sort-icon');
+    let currentSort = null;
+
+    sortIcons.forEach(icon => {
+        icon.addEventListener('click', () => {
+            const sortType = icon.dataset.sort;
+            const directionIcon = icon.nextElementSibling;
+
+            // if (currentSort === sortType) {
+            //     // Toggle direction
+            //     directionIcon.classList.toggle('desc');
+            //     console.log('выкл');
+            // } else {
+            //     // Reset all icons
+            //     sortIcons.forEach(i => i.nextElementSibling.classList.remove('active', 'desc'));
+            //     // Set new sort
+            //     directionIcon.classList.add('active');
+            //     currentSort = sortType;
+            //     console.log('вкл')
+            // }
+            directionIcon.classList.toggle('desc');
+            // Your sorting logic here
+            console.log(`Sorting by ${sortType}, direction: ${directionIcon.classList.contains('desc') ? 'descending' : 'ascending'}`);
+        });
+    });
+});

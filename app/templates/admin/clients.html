@@ -44,17 +44,28 @@
 
         <div id="historyModal" class="modal">
             <div class="modal-content">
-                <div class="sort-buttons">
-                    <button class="sort-button" data-sort="date">Сортировать по дате</button>
-                    <button class="sort-button" data-sort="time">Сортировать по времени</button>
+                <div class="sort-icons">
+                    <div class="sort-icon-wrapper">
+                        <i id="sortDate" class="fas fa-calendar-alt sort-icon" data-sort="date" title="Сортировать по дате"></i>
+                        <img src="/static/images/sort-svgrepo-com.svg?height=16&width=16" alt="Sort icon" class="sort-direction-icon active">
+                    </div>
+                    <div class="sort-icon-wrapper">
+                        <i id="sortTime" class="fas fa-clock sort-icon" data-sort="time" title="Сортировать по времени"></i>
+                        <img src="/static/images/sort-svgrepo-com.svg?height=16&width=16" alt="Sort icon" class="sort-direction-icon active">
+                    </div>
+                    <div class="sort-icon-wrapper">
+                        <i id="sortMoney" class="fas fa-dollar-sign sort-icon" data-sort="money" title="Сортировать по деньгам"></i>
+                        <img src="/static/images/sort-svgrepo-com.svg?height=16&width=16" alt="Sort icon" class="sort-direction-icon active">
+                    </div>
                 </div>
                 <h3 style="margin-top: 5px; text-align: center;">История посещений</h3>
                 <table id="historyTable">
                     <thead>
                         <tr>
-                            <th class="sortable" data-sort="date">Дата <i class="fas fa-sort"></i></th>
-                            <th class="sortable" data-sort="time">Время <i class="fas fa-sort"></i></th>
-                            <th>Комментарий</th>
+                            <th id="dateHeader" class="sortable" data-sort="date">Дата <i class="fas fa-sort"></i></th>
+                            <th id="timeHeader" class="sortable" data-sort="time">Время <i class="fas fa-sort"></i></th>
+                            <th id="commentHeader">Комментарий</th>
+                            <th id="moneyHeader" class="sortable" data-sort="money">Деньги <i class="fas fa-sort"></i></th>
                         </tr>
                     </thead>
                     <tbody id="historyTableBody"></tbody>

@@ -2,6 +2,9 @@ from fastapi import APIRouter, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
+from db.models.auth import user_check_authentication, update_authentication
+
+from datetime import datetime
 
 
 router = APIRouter(
@@ -20,17 +23,32 @@ class LoginData(BaseModel):
 @router.post('/login')
 async def post_login(request: Request, data: LoginData):
     
-    dict_user = {
-        'login': data.username,
-        'password': data.password
-    }
-    
+    # Проверка аутентификации
+    user = await user_check_authentication(data.username, data.password)
+
+    if user is None:
+        dict_user = {}
+        
+        # Обновление статуса, что пользователь не смог войти на сайт.
+        # Также время когда он не смог зайти
+        await update_authentication(data.username, False, datetime.now())
+        
+    else:
+        dict_user = {
+            'login': data.username,
+            'password': data.password
+        }
+        
+        # Обновление статуса, что пользователь вошел и находится на сайте.
+        # Также время когда он зашел
+        await update_authentication(data.username, True, datetime.now())
+        
     if dict_user:
         request.session.update(dict_user) # Создание сессии
         
         return JSONResponse(content={"message": "Успешная аутентификация"})
     else:
-         
+        
         raise HTTPException(status_code=401, detail="Неверное имя пользователя или пароль")
 
 
@@ -44,12 +62,13 @@ async def get_auth(request: Request):
 async def logout(request: Request):
     
     user = request.session.get('login')
-
-    if user:
-        request.session.clear()  # Очистка сессии
-        return JSONResponse(content={'status': True})
-    else:
-        return templates.TemplateResponse("auth.html", {"request": request})
+    request.session.clear()  # Очистка сессии
+    
+    # Обновление статуса, что пользователь вышел из сайта.
+    # Также время когда он вышел
+    await update_authentication(user, False, datetime.now())
+    
+    return JSONResponse(content={'status': True})
     
 
 def get_current_user(request: Request):

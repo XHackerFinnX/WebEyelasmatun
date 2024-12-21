@@ -22,7 +22,7 @@
                 {% else %}
                 <a href="/profile/{{user}}" class="dropdown-item"><i class="fas fa-user"></i> Мой профиль</a>
                 {% endif %}
-                <a href="/pricelist" class="dropdown-item"><i class="fas fa-tags"></i> Прайс-лист</a>
+                <a href="/pricelist/{{user}}" class="dropdown-item"><i class="fas fa-tags"></i> Прайс-лист</a>
                 <a href="#" class="dropdown-item"><i class="fas fa-star"></i> Отзывы</a>
                 <a href="#" class="dropdown-item"><i class="fas fa-envelope"></i> Контакты</a>
                 <a href="#" id="logoutButton" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Выйти</a>
@@ -30,11 +30,16 @@
         </nav>
     </header>
 
-    <p>Прайс-лист</p>
+    <main>
+        <h1>Прайс-лист</h1>
+        <div class="price-list-container">
+            <button id="addItemBtn" class="add-item-btn"><i class="fas fa-plus"></i> Добавить пункт</button>
+            <ul id="priceList" class="price-list"></ul>
+        </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
     <script src="/static/js/main/pricel.js"></script>
 </body>
 </html>
-

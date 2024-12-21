@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eyelasmatun - График заработка</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="/static/css/admin/earnings-chart.css">
+    <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="fixed-header">
+        <nav>
+            <div class="menu-icon" id="menuIcon">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="/" class="dropdown-item"><i class="fas fa-calendar-plus"></i> Записаться</a>
+                <a href="/profile/{{user}}" class="dropdown-item"><i class="fas fa-user-cog"></i> Админ панель</a>
+                <a href="/pricelist" class="dropdown-item"><i class="fas fa-tags"></i> Прайс-лист</a>
+                <a href="#" class="dropdown-item"><i class="fas fa-star"></i> Отзывы</a>
+                <a href="#" class="dropdown-item"><i class="fas fa-envelope"></i> Контакты</a>
+                <a href="#" id="logoutButton" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>График заработка</h1>
+        <div class="filter-container">
+            <button class="filter-btn active" data-filter="day" aria-label="Фильтр по дням">
+                <i class="fas fa-calendar-day"></i>
+            </button>
+            <button class="filter-btn" data-filter="week" aria-label="Фильтр по неделям">
+                <i class="fas fa-calendar-week"></i>
+            </button>
+            <button class="filter-btn" data-filter="month" aria-label="Фильтр по месяцам">
+                <i class="fas fa-calendar-alt"></i>
+            </button>
+            <button class="filter-btn" data-filter="year" aria-label="Фильтр по годам">
+                <i class="fas fa-calendar"></i>
+            </button>
+            <div class="date-picker-container">
+                <input type="text" id="datePicker" placeholder="Выберите дату">
+                <i class="fas fa-calendar-alt date-picker-icon"></i>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="earningsChart"></canvas>
+        </div>
+        <div class="table-container">
+            <table id="earningsTable">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Заработок</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Данные таблицы будут добавлены динамически -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
+    <script src="/static/js/admin/earnings-chart.js"></script>
+</body>
+</html>
+

@@ -96,22 +96,50 @@ async def record_post(request: Request, data_record: RecordUser, user: dict = De
         return templates_auth.TemplateResponse("auth.html", {"request": request})
     
     
-@router.get('/pricelist')
-async def pricelist_get(request: Request, user: dict = Depends(get_current_user)):
+@router.get('/pricelist/admin/{username}')
+async def pricelist_get(request: Request, username: int, user: dict = Depends(get_current_user)):
     
     if user:
-        
-        if user:
-            if user in [1387002896, 1563475165]:
-                userP = "admin/" + str(user)
-                admin_or_user = 'admin'
-                
-            else:
-                userP = "users/" + str(user)
-                admin_or_user = 'user'
-        
+
+        if user in [1387002896, 1563475165]:
+            userP = "admin/" + str(username)
+            admin_or_user = 'admin'
+            price_html = 'pricel.html'
+            
+        else:
+            userP = "users/" + str(username)
+            admin_or_user = 'user'
+            price_html = 'pricelistuser.html'
+    
         return templates_main.TemplateResponse(
-            "pricel.html",
+            price_html,
+            {
+                "request": request,
+                "user": userP,
+                "admin_or_user": admin_or_user
+            }
+        )
+    else:
+        return templates_auth.TemplateResponse("auth.html", {"request": request})
+    
+    
+@router.get('/pricelist/users/{username}')
+async def pricelist_get(request: Request, username: int, user: dict = Depends(get_current_user)):
+    
+    if user:
+
+        if user in [1387002896, 1563475165]:
+            userP = "admin/" + str(username)
+            admin_or_user = 'admin'
+            price_html = 'pricel.html'
+            
+        else:
+            userP = "users/" + str(username)
+            admin_or_user = 'user'
+            price_html = 'pricelistuser.html'
+    
+        return templates_main.TemplateResponse(
+            price_html,
             {
                 "request": request,
                 "user": userP,

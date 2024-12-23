@@ -45,7 +45,7 @@ async def update_authentication(username: int, status: bool, last_date):
                 cursor.execute(query, (status, last_date, username))
             conn.commit()
     except (InterfaceError, Error) as error:
-        print(f"Ошибка проверки пользователя аутентификация {error}")
+        print(f"Ошибка обновления пользователя аутентификация {error}")
     finally:
         if Auth._connection:
             Auth._connection.close()

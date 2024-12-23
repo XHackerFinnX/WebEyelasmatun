@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
             if (response.ok){
                 console.log('День удален');
+                alert('День удален');
             }
 
         } else {

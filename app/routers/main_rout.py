@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from pydantic import BaseModel
 from routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
+from db.models.main_windows import windows_day, windows_day_time
 
 import asyncio
 import random
@@ -58,20 +59,17 @@ async def main_get(request: Request, user: dict = Depends(get_current_user)):
     
 
 @router.post('/date_record')
-async def date_record(request: Request, tod: ToDay, user: dict = Depends(get_current_user)):
+async def date_record(tod: ToDay):
     
-    dates = [(datetime.now() + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+    dates = [(d[0] - timedelta(days=1)).strftime("%Y-%m-%d") for d in await windows_day()]
     
     return JSONResponse(content={"dates": dates})
 
 
 @router.post('/time_record')
-async def time_record(request: Request, timeday: TimeDay, user: dict = Depends(get_current_user)):
+async def time_record(timeday: TimeDay):
     
-    if timeday.time == '2024-12-12':
-        times = ["10:00", "12:00", "14:00", "16:00"]
-    else:
-        times = ["10:00"]
+    times = await windows_day_time(datetime.strptime(timeday.time, "%Y-%m-%d") + timedelta(days=1))
     
     return JSONResponse(content={"times_r": times})
 

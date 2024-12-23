@@ -9,7 +9,6 @@ from utils.ip_address import get_ip
 
 import asyncio
 import random
-import requests
 
 router = APIRouter(
     prefix="",

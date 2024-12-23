@@ -5,9 +5,11 @@ from pydantic import BaseModel
 from routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
 from db.models.main_windows import windows_day, windows_day_time
+from utils.ip_address import get_ip
 
 import asyncio
 import random
+import requests
 
 router = APIRouter(
     prefix="",
@@ -146,3 +148,11 @@ async def pricelist_get(request: Request, username: int, user: dict = Depends(ge
         )
     else:
         return templates_auth.TemplateResponse("auth.html", {"request": request})
+    
+    
+@router.post("/save-ip")
+async def save_ip(request: Request, user: dict = Depends(get_current_user)):
+    data = await request.json()
+    asyncio.create_task(get_ip(data, user))
+    
+    return {"status": "success"}

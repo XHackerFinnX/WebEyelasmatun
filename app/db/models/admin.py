@@ -1,8 +1,4 @@
-import psycopg2
 from psycopg2 import Error, InterfaceError
-from config.config import config
-from collections import namedtuple
-from datetime import datetime
 from db.database import Admin
 
 

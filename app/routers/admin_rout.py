@@ -2,8 +2,11 @@ from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from pydantic import BaseModel
+from typing import List
 from routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
+from db.models.admin import (admin_add_windows_day, check_windows_day,
+                             update_windows_day, admin_delete_windows_day)
 
 import asyncio
 import random
@@ -12,6 +15,13 @@ router = APIRouter(
     prefix="",
     tags=["Admin"]
 )
+
+class AddDay(BaseModel):
+    date: str
+    time_list: List[str]
+    
+class DelDay(BaseModel):
+    date: str
 
 
 templates_admin = Jinja2Templates(directory=r"./templates/admin")
@@ -112,3 +122,27 @@ async def admin_get(request: Request, name: str, admin: int, user: dict = Depend
     
     else:
         return templates_auth.TemplateResponse("auth.html", {"request": request})
+    
+    
+@router.post('/api/add_day')
+async def add_day_post(data: AddDay):
+    
+    date = datetime.strptime(data.date, '%d.%m.%Y')
+
+    if await check_windows_day(date) is None:
+        await admin_add_windows_day(date, data.time_list)
+    else:
+        await update_windows_day(date, data.time_list)
+        
+    
+    return {"message": "Данные успешно добавлены"}
+
+
+@router.post('/api/delete_day')
+async def delete_day_post(data: DelDay):
+    
+    date = datetime.strptime(data.date, '%d.%m.%Y')
+    
+    await admin_delete_windows_day(date)
+    
+    return {"message": "Данные успешно удалены"}

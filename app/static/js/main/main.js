@@ -1,5 +1,5 @@
-document.addEventListener('DOMContentLoaded', async function() {
-    const today = 'today'
+document.addEventListener('DOMContentLoaded', async function () {
+    const today = 'today';
     let availableDates = [];
 
     try {
@@ -14,11 +14,51 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (responsedr.ok) {
             const data = await responsedr.json();
             availableDates = data.dates;
+
+            // Выполняем main после получения availableDates
+            await main();
         } else {
             console.error('Ошибка при выполнении запроса:', responsedr.status);
         }
     } catch (error) {
         console.error('Ошибка:', error);
+    }
+
+    // Основная функция для получения IP и отправки на сервер
+    async function main() {
+        async function getUserIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                if (!response.ok) throw new Error('Ошибка получения IP');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        async function sendIPToServer(ip) {
+            try {
+                const response = await fetch('/save-ip', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ ip }),
+                });
+
+                if (!response.ok) throw new Error('Ошибка отправки IP');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        const ip = await getUserIP();
+        if (ip) {
+            await sendIPToServer(ip);
+        } else {
+            console.error('');
+        }
     }
 
     let calendar = flatpickr("#calendar", {

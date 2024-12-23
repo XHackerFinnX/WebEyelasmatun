@@ -57,13 +57,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Assign day button
     const assignButton = document.getElementById('assignDay');
-    assignButton.addEventListener('click', function() {
+    assignButton.addEventListener('click', async function() {
         const selectedDate = document.getElementById('datepicker').value;
+
+        const date = selectedDate;
 
         if (selectedDate) {
             console.log('Selected date:', selectedDate);
+
+            const response = await fetch('/api/delete_day', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ date }),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            if (response.ok){
+                console.log('День удален');
+            }
+
         } else {
-            alert('Пожалуйста, выберите дату и хотя бы одно время');
+            alert('Пожалуйста, выберите дату');
         }
     });
 });

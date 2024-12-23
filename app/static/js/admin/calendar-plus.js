@@ -71,13 +71,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Assign day button
     const assignButton = document.getElementById('assignDay');
-    assignButton.addEventListener('click', function() {
+    assignButton.addEventListener('click', async function() {
         const selectedDate = document.getElementById('datepicker').value;
         const selectedTimes = Array.from(document.querySelectorAll('.time-slot.selected')).map(slot => slot.textContent);
 
         if (selectedDate && selectedTimes.length > 0) {
             console.log('Selected date:', selectedDate);
             console.log('Selected times:', selectedTimes);
+
+            const date = selectedDate;
+            const time_list = selectedTimes;
+
+            const response = await fetch('/api/add_day', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ date, time_list }),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            if (response.ok){
+                console.log('Данные добавлены');
+            }
+
         } else {
             alert('Пожалуйста, выберите дату и хотя бы одно время');
         }

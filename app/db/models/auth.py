@@ -11,7 +11,7 @@ async def user_check_authentication(username: int, password: str):
     
     query = """
     SELECT login
-    FROM eye_authentication 
+    FROM authentication 
     WHERE login = %s
     AND password = %s
     """
@@ -34,7 +34,7 @@ async def user_check_authentication(username: int, password: str):
 async def update_authentication(username: int, status: bool, last_date):
     
     query = """
-    UPDATE eye_authentication
+    UPDATE authentication
     SET (status, last_date) = (%s, %s)
     WHERE login = %s
     """

@@ -9,7 +9,7 @@ async def windows_day():
     
     query = """
     SELECT date
-    FROM eye_windows
+    FROM windows
     WHERE date >= %s
     """
     
@@ -32,7 +32,7 @@ async def windows_day_time(date):
     
     query = """
     SELECT time
-    FROM eye_windows
+    FROM windows
     WHERE date = %s
     """
     

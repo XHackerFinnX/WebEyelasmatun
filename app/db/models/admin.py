@@ -7,7 +7,7 @@ Admin = Admin()
 async def admin_add_windows_day(date, time):
     
     query = """
-    INSERT INTO eye_windows (
+    INSERT INTO windows (
         date,
         time
     ) VALUES (%s, %s)
@@ -31,7 +31,7 @@ async def check_windows_day(date):
     
     query = """
     SELECT date
-    FROM eye_windows
+    FROM windows
     WHERE date = %s
     """
     
@@ -53,7 +53,7 @@ async def check_windows_day(date):
 async def update_windows_day(date, time):
     
     query = """
-    UPDATE eye_windows
+    UPDATE windows
     SET (date, time) = (%s, %s)
     WHERE date = %s
     """
@@ -75,7 +75,7 @@ async def update_windows_day(date, time):
 async def admin_delete_windows_day(date):
     
     query = """
-    DELETE FROM eye_windows
+    DELETE FROM windows
     WHERE date = %s
     """
     

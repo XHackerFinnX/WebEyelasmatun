@@ -12,7 +12,7 @@ User = User()
 async def update_ip_user(data_ip: list, id_user: int):
     
     query = """
-    UPDATE eye_profile_user
+    UPDATE profile_user
     SET ip_address = %s
     WHERE id = %s
     """

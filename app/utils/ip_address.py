@@ -3,7 +3,7 @@ import httpx
 import asyncio
 
 async def get_ip(data, login):
-    await asyncio.sleep(2)
+
     try:
         ip_address = data['ip']
         url = f"http://ip-api.com/json/{ip_address}"

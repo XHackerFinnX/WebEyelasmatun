@@ -1,6 +1,7 @@
 from db.models.user import update_ip_user
 import httpx
 import asyncio
+import json
 
 async def get_ip(data, login):
 
@@ -18,9 +19,9 @@ async def get_ip(data, login):
                     ip_data['city'],
                     ip_data['regionName'],
                     ip_data['country'],
-                    (ip_data['lat'], ip_data['lon'])
+                    f"{ip_data['lat']}, {ip_data['lon']}"  # Преобразуем координаты в строку
                 ]
-
+                
                 await update_ip_user(data_ip, login)
             else:
                 print("Ошибка получения данных:", response.status_code)

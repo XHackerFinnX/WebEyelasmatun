@@ -37,21 +37,21 @@
     <div class="profile-field">
         <label>Имя:</label>
         <div class="input-button-container">
-            <input type="text" id="userName" value={{name_user}} readonly>
+            <input type="text" id="userName" value="{{name_user | escape}}" readonly>
             <button class="edit-button" data-field="userName"><i class="fas fa-pencil-alt"></i></button>
         </div>
     </div>
     <div class="profile-field">
         <label>ТГ:</label>
         <div class="input-button-container">
-            <input type="text" id="userTg" value={{tg_user}} readonly>
+            <input type="text" id="userTg" value="{{tg_user | escape}}" readonly>
             <button class="edit-button" data-field="userTg"><i class="fas fa-pencil-alt"></i></button>
         </div>
     </div>
     <div class="profile-field">
         <label>Номер телефона:</label>
         <div class="input-button-container">
-            <input type="tel" id="userPhone" value={{number_user}} readonly>
+            <input type="tel" id="userPhone" value="{{number_user | escape}}" readonly>
             <button class="edit-button" data-field="userPhone"><i class="fas fa-pencil-alt"></i></button>
         </div>
     </div>

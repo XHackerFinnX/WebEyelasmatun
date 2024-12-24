@@ -4,6 +4,8 @@ from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from pydantic import BaseModel
 from routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
+from db.models.user import (update_name_user, update_telegram_user,
+                            update_telephone_user, select_profile_user)
 
 import asyncio
 import random
@@ -29,12 +31,13 @@ async def users_get(request: Request, users: int | None = None, user: dict = Dep
     
     if user:
         if user == users:
+            profile_user = await select_profile_user(users)
             userP = "users/" + str(users)
             id_user = users
-            name_user = 'Алексей'
-            tg_user = '@AlexGood_man'
-            number_user = '-'
-            
+            name_user = profile_user['name']
+            tg_user = profile_user['telegram']
+            number_user = profile_user['telephone']
+
             return templates_user.TemplateResponse(
                 "user.html",
                 {
@@ -58,7 +61,16 @@ async def update_users_post(request: Request, data_user: UpdateUser, users: int 
     
     if user:
         if user == users:
-            print(data_user, users)
+            
+            if data_user.name == 'userName':
+                asyncio.create_task(update_name_user(data_user.update_name, users))
+            
+            elif data_user.name == 'userTg':
+                asyncio.create_task(update_telegram_user(data_user.update_name, users))
+                
+            elif data_user.name == 'userPhone':
+                asyncio.create_task(update_telephone_user(data_user.update_name, users))
+            
             return JSONResponse(content={'status': True})
     
     else:

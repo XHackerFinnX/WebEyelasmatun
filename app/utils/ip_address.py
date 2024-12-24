@@ -1,7 +1,5 @@
 from db.models.user import update_ip_user
 import httpx
-import asyncio
-import json
 
 async def get_ip(data, login):
 

@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
 from db.models.main_windows import windows_day, windows_day_time
+from db.models.user import update_last_visit_user
 from utils.ip_address import get_ip
 
 import asyncio
@@ -60,9 +61,12 @@ async def main_get(request: Request, user: dict = Depends(get_current_user)):
     
 
 @router.post('/date_record')
-async def date_record(tod: ToDay):
+async def date_record(tod: ToDay, user: dict = Depends(get_current_user)):
     
     dates = [(d[0] - timedelta(days=1)).strftime("%Y-%m-%d") for d in await windows_day()]
+    date_today = datetime.now()
+    
+    asyncio.create_task(update_last_visit_user(date_today, user))
     
     return JSONResponse(content={"dates": dates})
 

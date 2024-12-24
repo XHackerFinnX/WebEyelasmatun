@@ -9,7 +9,7 @@ User = User()
     
 # ):
 
-async def update_ip_user(data_ip: list, id_user: int):
+async def update_ip_user(data_ip, id_user: int):
     
     query = """
     UPDATE profile_user

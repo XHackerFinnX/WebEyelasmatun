@@ -2,7 +2,6 @@ from psycopg2 import Error, InterfaceError
 from datetime import datetime
 from db.database import Windows
 
-
 Win = Windows()
 
 async def windows_day():

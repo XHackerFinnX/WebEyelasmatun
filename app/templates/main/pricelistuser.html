@@ -34,16 +34,12 @@
         <h1>Прайс-лист</h1>
         <div class="price-list-container">
             <ul id="priceList" class="price-list">
-                <li class="price-item" data-id="1734815318712">
-                    <span class="item-name-display">123</span>
-                    <span class="item-price-display">324 руб.</span>
+                {% for pl in price_list_user %}
+                <li class="price-item" data-id="{{pl['id']}}">
+                    <span class="item-name-display">{{pl['name']}}</span>
+                    <span class="item-price-display">{{pl['price']}} руб.</span>
                 </li>
-                <li class="price-item" data-id="1734815318713">
-                    <span class="item-name-display">Опишите задачу, а мастера сами предложат свои услуги.
-                        Выберите исполнителя по рейтингу и отзывам других клиентов.
-                        Договоритесь о цене самостоятельно</span>
-                    <span class="item-price-display">1500 руб.</span>
-                </li>
+                {% endfor %}
             </ul>
         </div>
     </main>

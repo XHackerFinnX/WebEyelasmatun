@@ -21,8 +21,8 @@ class Authentication:
     
 class Windows:
     def __init__(self):
-        self._connection = None
-        
+        self._pool = None
+
     async def connect(self):
         if not self._pool:
             self._pool = await asyncpg.create_pool(

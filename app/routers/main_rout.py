@@ -9,7 +9,7 @@ from db.models.main_windows import (windows_day, windows_day_time,
                                     price_list_check, price_list_update, price_list_delete,
                                     price_list_select_user)
 from db.models.user import update_last_visit_user, add_record_user, check_record_time
-from db.models.admin import select_day_time, update_windows_day, admin_delete_windows_day
+from db.models.admin import select_day_time, update_windows_day, admin_delete_windows_day, admin_list
 from utils.ip_address import get_ip
 
 import asyncio
@@ -48,7 +48,12 @@ async def favicon():
 async def main_get(request: Request, user: dict = Depends(get_current_user)):
     
     if user:
-        if user in [1387002896, 1563475165]:
+        
+        admin_list_super = [i[0] for i in await admin_list('superadmin')]
+        admin_list_normal = [i[0] for i in await admin_list('admin')]
+        admin_list_full = admin_list_super + admin_list_normal
+        
+        if user in admin_list_full:
             userP = "admin/" + str(user)
             admin_or_user = 'admin'
             
@@ -129,7 +134,11 @@ async def pricelist_get(request: Request, username: int, user: dict = Depends(ge
     
     if user:
 
-        if user in [1387002896, 1563475165]:
+        admin_list_super = [i[0] for i in await admin_list('superadmin')]
+        admin_list_normal = [i[0] for i in await admin_list('admin')]
+        admin_list_full = admin_list_super + admin_list_normal
+        
+        if user in admin_list_full:
             userP = "admin/" + str(username)
             admin_or_user = 'admin'
             price_html = 'pricel.html'
@@ -156,7 +165,11 @@ async def pricelist_get(request: Request, username: int, user: dict = Depends(ge
     
     if user:
 
-        if user in [1387002896, 1563475165]:
+        admin_list_super = [i[0] for i in await admin_list('superadmin')]
+        admin_list_normal = [i[0] for i in await admin_list('admin')]
+        admin_list_full = admin_list_super + admin_list_normal
+        
+        if user in admin_list_full:
             userP = "admin/" + str(username)
             admin_or_user = 'admin'
             price_html = 'pricel.html'
@@ -218,7 +231,11 @@ async def price_save_post(data: PriceItem):
 @router.delete('/api/price-items/{itemId}')
 async def price_delete(itemId: int, user: dict = Depends(get_current_user)):
     
-    if user in [1387002896, 1563475165]:
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    admin_list_full = admin_list_super + admin_list_normal
+    
+    if user in admin_list_full:
         await price_list_delete(itemId)
         return JSONResponse(content={'status': True})
     else:

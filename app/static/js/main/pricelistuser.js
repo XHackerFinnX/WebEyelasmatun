@@ -42,12 +42,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // New price list functionality
-    addItemBtn.addEventListener('click', function() {
-        const newItem = { id: Date.now(), name: '', price: '' };
-        addPriceItem(newItem);
-    });
-
     function addPriceItem(item) {
         const li = document.createElement('li');
         li.className = 'price-item';
@@ -90,7 +84,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
         setupDeleteListener(li);
     }
-    // Load existing price items when the page loads
-    loadPriceItems();
 });
 

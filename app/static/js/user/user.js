@@ -1,3 +1,8 @@
+function getUserId() {
+    const userIdElement = document.getElementById("userId");
+    return userIdElement ? userIdElement.textContent.trim() : null;
+}
+
 let isLoading = false;
 
 const myAppointmentsBtn = document.getElementById('myAppointmentsBtn');
@@ -6,13 +11,6 @@ const appointmentsList = document.getElementById('appointmentsList');
 const downloadRecord = document.getElementById('downolad-record');
 const menuList = document.getElementById('menuIcon');
 
-
-// Тестовые данные для имитации записей
-const mockAppointments = [
-    { id: 1, date: '2024-12-20', time: '10:00', comment: 'Обследование глаз' },
-    { id: 2, date: '2024-12-22', time: '15:00', comment: 'Контрольное обследование' },
-    { id: 3, date: '2024-12-24', time: '09:30', comment: 'Подбор очков' },
-];
 
 myAppointmentsBtn.addEventListener('click', async function() {
     appointmentsModal.style.display = 'block';
@@ -35,34 +33,42 @@ async function loadAppointments() {
         console.log('Загрузка записей...');
         appointmentsList.innerHTML = '<p class="loading-message">Загрузка записей...</p>';
         
-        // Устанавливаем флаг загрузки
         isLoading = true;
-        
-        // Отключаем кнопку "Мои записи" и кнопку закрытия во время загрузки
         myAppointmentsBtn.disabled = true;
         modalCloseButton.disabled = true;
-        
-        // Добавляем класс для блокировки закрытия модального окна
         appointmentsModal.classList.add('loading');
         
-        // Имитируем задержку, как будто данные приходят с сервера
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Используем тестовые данные
-        appointmentsList.innerHTML = mockAppointments.map(appointment => `
-            <div class="appointment-item" data-id="${appointment.id}">
-                <div class="appointment-info">
-                    <p><strong>Дата:</strong> ${appointment.date}</p>
-                    <p><strong>Время:</strong> ${appointment.time}</p>
-                    <p><strong>Комментарий:</strong> ${appointment.comment}</p>
+        const response = await fetch('/record_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId: getUserId() }) // Assuming you have a function to get the user ID
+        });
+        if (!response.ok) {
+            throw new Error('Ошибка при загрузке записей');
+        }
+        
+        const appointments = await response.json();
+        console.log(appointments.status);
+        if (appointments.status) {
+            appointmentsList.innerHTML = appointments.data.map(appointment => `
+                <div class="appointment-item" data-id="${appointment.id}">
+                    <div class="appointment-info">
+                        <p><strong>Дата:</strong> ${appointment.date}</p>
+                        <p><strong>Время:</strong> ${appointment.time}</p>
+                        <p><strong>Комментарий:</strong> ${appointment.comment}</p>
+                    </div>
+                    <button class="delete-btn" data-id="${appointment.id}-${appointment.date}-${appointment.time}" title="Удалить запись">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </div>
-                <button class="delete-btn" data-id="${appointment.id}" title="Удалить запись">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
-        `).join('');
+            `).join('');
+        }
+        else {
+            appointmentsList.innerHTML = ''
+        }
 
-        // Добавляем обработчики на кнопки удаления
         document.querySelectorAll('.delete-btn').forEach(btn => {
             btn.addEventListener('click', deleteAppointment);
         });
@@ -72,14 +78,9 @@ async function loadAppointments() {
         console.error('Ошибка загрузки записей:', error);
         appointmentsList.innerHTML = '<p class="error-message">Ошибка при загрузке записей. Пожалуйста, попробуйте позже.</p>';
     } finally {
-        // Сбрасываем флаг загрузки
         isLoading = false;
-        
-        // Включаем кнопку "Мои записи" и кнопку закрытия после загрузки
         myAppointmentsBtn.disabled = false;
         modalCloseButton.disabled = false;
-        
-        // Удаляем класс для разблокировки закрытия модального окна
         appointmentsModal.classList.remove('loading');
     }
 }
@@ -96,23 +97,29 @@ async function deleteAppointment(event) {
 
     try {
         console.log(`Удаление записи с ID: ${appointmentId}`);
-        // Имитируем задержку на отправку POST-запроса
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Отправляем POST запрос на удаление записи
+        const response = await fetch('/delete_record', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ appointmentId }),
+        });
 
-        // Имитируем удаление записи из тестовых данных
-        const index = mockAppointments.findIndex(app => app.id === Number(appointmentId));
-        if (index !== -1) {
-            mockAppointments.splice(index, 1);
-            appointmentItem.remove();
-            console.log(`Запись с ID: ${appointmentId} успешно удалена.`);
-        } else {
-            throw new Error('Запись не найдена');
+        if (!response.ok) {
+            throw new Error('Ошибка при удалении записи');
         }
+
+        // Удаляем элемент из DOM
+        appointmentItem.remove();
+        console.log(`Запись с ID: ${appointmentId} успешно удалена.`);
     } catch (error) {
         console.error('Ошибка при удалении записи:', error);
         alert('Не удалось удалить запись. Попробуйте позже.');
         // Возвращаем иконку корзины в случае ошибки
         btn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+    } finally {
         btn.disabled = false;
     }
 }

@@ -6,10 +6,10 @@ from typing import List
 from routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
 from db.models.admin import (admin_add_windows_day, check_windows_day,
-                             update_windows_day, admin_delete_windows_day)
+                             update_windows_day, admin_delete_windows_day,
+                             schedule_record_user, admin_list)
 
 import asyncio
-import random
 
 router = APIRouter(
     prefix="",
@@ -21,6 +21,9 @@ class AddDay(BaseModel):
     time_list: List[str]
     
 class DelDay(BaseModel):
+    date: str
+    
+class ScheduleDate(BaseModel):
     date: str
 
 
@@ -43,7 +46,11 @@ async def profile_error_get(request: Request, user: dict = Depends(get_current_u
 async def profile_admin_get(request: Request, admin: int | None = None, user: dict = Depends(get_current_user)):
     
     if user:
-        if user in [1387002896, 1563475165]:
+        admin_list_super = [i[0] for i in await admin_list('superadmin')]
+        admin_list_normal = [i[0] for i in await admin_list('admin')]
+        admin_list_full = admin_list_super + admin_list_normal
+
+        if user in admin_list_full:
             if user == admin:
                 userP = "admin/" + str(admin)
                 
@@ -62,7 +69,12 @@ async def profile_admin_get(request: Request, admin: int | None = None, user: di
 async def update_admin_post(name: str, admin: int, user: dict = Depends(get_current_user)):
     
     if user:
-        if user in [1387002896, 1563475165]:
+        
+        admin_list_super = [i[0] for i in await admin_list('superadmin')]
+        admin_list_normal = [i[0] for i in await admin_list('admin')]
+        admin_list_full = admin_list_super + admin_list_normal
+        
+        if user in admin_list_full:
             if user == admin:
                 
                 return JSONResponse(content={
@@ -76,7 +88,12 @@ async def update_admin_post(name: str, admin: int, user: dict = Depends(get_curr
 async def admin_get(request: Request, name: str, admin: int, user: dict = Depends(get_current_user)):
     
     if user:
-        if user in [1387002896, 1563475165]:
+        
+        admin_list_super = [i[0] for i in await admin_list('superadmin')]
+        admin_list_normal = [i[0] for i in await admin_list('admin')]
+        admin_list_full = admin_list_super + admin_list_normal
+        
+        if user in admin_list_full:
             if user == admin:
                 userP = "admin/" + str(admin)
 
@@ -146,3 +163,34 @@ async def delete_day_post(data: DelDay):
     await admin_delete_windows_day(date)
     
     return {"message": "Данные успешно удалены"}
+
+
+@router.post('/api/appointments-schedule')
+async def schedule_user(data: ScheduleDate, user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    admin_list_full = admin_list_super + admin_list_normal
+    
+    if user in admin_list_full:
+    
+        date = datetime.strptime(data.date, '%d.%m.%Y')
+        user_list = await schedule_record_user(date)
+        if not user_list:
+            return JSONResponse(content=[])
+
+        else:
+            user_schedule_list = []
+            for ul in user_list:
+                user_dict = {
+                    'id': ul[0],
+                    'time': ul[1].split('T')[1][:-3],
+                    'comment': ul[2],
+                    'clientName': ul[3],
+                    'telegramUsername': ul[4]
+                }
+                user_schedule_list.append(user_dict)
+                
+            return JSONResponse(content=user_schedule_list)
+    else:
+        return JSONResponse(content={'status': False}, status_code=401)

@@ -127,3 +127,37 @@ async def check_record_time(id_user: int, date, time):
     except Exception as error:
         print(f"Ошибка проверки записи на это время: {error}")
         return None
+    
+
+async def select_record_user(id_user: int):
+    
+    query = """
+    SELECT id, date, time, comment_user
+    FROM record_user
+    WHERE id = $1
+    """
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            users = await conn.fetch(query, id_user)
+            return users if users else None
+    except Exception as error:
+        print(f"Ошибка получения записей клиента: {error}")
+        return None
+    
+
+async def delete_record_user(id_user: int, date, time):
+    
+    query = """
+    DELETE FROM record_user
+    WHERE id = $1 AND date = $2 AND time = $3
+    """
+    try:
+        print(id_user, date, time)
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            await conn.execute(query, id_user, date, time)
+            return True
+    except Exception as error:
+        print(f"Ошибка удаления записи клиента: {error}")
+        return False

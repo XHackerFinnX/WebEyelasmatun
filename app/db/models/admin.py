@@ -4,6 +4,30 @@ from db.database import Admin
 
 Admin = Admin()
 
+
+async def admin_list(status: str):
+    
+    query = """
+    SELECT id
+    FROM admin_list
+    WHERE status = %s
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (status,))
+                admin_l = cursor.fetchall()
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка получения список админов {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return admin_l
+    
+
 async def admin_add_windows_day(date, time):
     
     query = """
@@ -114,3 +138,28 @@ async def select_day_time(date):
             Admin._connection.close()
                 
         return time_list[0]
+    
+    
+async def schedule_record_user(date):
+    
+    query = """
+    SELECT ru.id, ru.time, ru.comment_user, pu.name, pu.telegram
+    FROM record_user AS ru
+    JOIN profile_user AS pu
+    ON ru.id = pu.id
+    WHERE ru.date = %s
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (date,))
+                user_list = cursor.fetchall()
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка получения клиентов {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return user_list

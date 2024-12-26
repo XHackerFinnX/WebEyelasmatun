@@ -5,7 +5,8 @@ from pydantic import BaseModel
 from routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
 from db.models.main_windows import windows_day, windows_day_time
-from db.models.user import update_last_visit_user
+from db.models.user import update_last_visit_user, add_record_user, check_record_time
+from db.models.admin import select_day_time, update_windows_day, admin_delete_windows_day
 from utils.ip_address import get_ip
 
 import asyncio
@@ -84,16 +85,32 @@ async def record_post(request: Request, data_record: RecordUser, user: dict = De
     
     if user:
         
-        date_r = datetime.strptime(data_record.date, '%Y-%m-%d')
-        time_r = data_record.time
-        comment_r = data_record.comment
-        print(f"{user}\n{date_r}\n{time_r}\n{comment_r}")
+        date_r = datetime.strptime(data_record.date, '%Y-%m-%d') + timedelta(days=1)
+        time_r = datetime.strptime(data_record.time, '%H:%M')
+        date_full = datetime.combine(date_r, time_r.time())
+        comment_r = data_record.comment or '-'
         
         await asyncio.sleep(3)
         
-        tf = random.choice([True, False])
-        
-        return JSONResponse(content={"success": tf})
+        try:
+            if await check_record_time(user, date_r, date_full) is None:
+                await add_record_user(user, date_r, date_full, comment_r, True)
+                
+                time_list: list = await select_day_time(date_r)
+                
+                for t in time_list:
+                    if t == data_record.time:
+                        time_list.remove(t)
+                        await update_windows_day(date_r, time_list)
+                        
+                if not time_list:
+                    await admin_delete_windows_day(date_r)
+                
+                return JSONResponse(content={"success": True})
+            else:
+                return JSONResponse(content={"success": False})
+        except:
+            return JSONResponse(content={"success": False})
         
     else:
         return templates_auth.TemplateResponse("auth.html", {"request": request})

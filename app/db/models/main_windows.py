@@ -10,22 +10,17 @@ async def windows_day():
     query = """
     SELECT date
     FROM windows
-    WHERE date >= %s
+    WHERE date >= $1
     """
-
+    
     try:
-        with Win._connect() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query, (datetime.today().date(),))
-                day = cursor.fetchall()
-            conn.commit()
-    except (InterfaceError, Error) as error:
-        print(f"Ошибка получения дат для отображения свободных окошек {error}")
-    finally:
-        if Win._connection:
-            Win._connection.close()
-                
-        return day
+        pool = await Win.connect()
+        async with pool.acquire() as conn:
+            day = await conn.fetch(query, datetime.today().date())
+            return day
+    except Exception as error:
+        print(f"Ошибка получения дат для отображения свободных окошек: {error}")
+        return None
     
 
 async def windows_day_time(date):
@@ -33,19 +28,22 @@ async def windows_day_time(date):
     query = """
     SELECT time
     FROM windows
-    WHERE date = %s
+    WHERE date = $1
     """
     
     try:
-        with Win._connect() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query, (date,))
-                time = cursor.fetchone()
-            conn.commit()
-    except (InterfaceError, Error) as error:
-        print(f"Ошибка получения времени для окошек {error}")
-    finally:
-        if Win._connection:
-            Win._connection.close()
-                
-        return time[0]
+        pool = await Win.connect()
+        async with pool.acquire() as conn:
+            time = await conn.fetch(query, date)
+            return time[0]
+    except Exception as error:
+        print(f"Ошибка получения времени для окошек: {error}")
+        return None
+    
+
+async def update_time_in_day(date, time):
+    
+    query = """
+    UPDATE windows
+    SET time = %s
+    """

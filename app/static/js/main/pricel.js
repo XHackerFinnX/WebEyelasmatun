@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         priceList.appendChild(li);
-
+    
         setupItemListeners(li);
     }
 
@@ -154,11 +154,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function loadPriceItems() {
         try {
-            const response = await fetch('/api/price-items');
+            const response = await fetch('/api/price-load-items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
             if (!response.ok) {
                 throw new Error('Failed to load price items');
             }
             const items = await response.json();
+            console.log(items);
             items.forEach(addPriceItem);
         } catch (error) {
             console.error('Error loading price items:', error);

@@ -91,3 +91,26 @@ async def admin_delete_windows_day(date):
             Admin._connection.close()
                 
         return
+    
+    
+async def select_day_time(date):
+    
+    query = """
+    SELECT time
+    FROM windows
+    WHERE date = %s
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (date,))
+                time_list = cursor.fetchone()
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка проверки даты {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return time_list[0]

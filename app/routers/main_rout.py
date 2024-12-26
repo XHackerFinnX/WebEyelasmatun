@@ -4,7 +4,10 @@ from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from pydantic import BaseModel
 from routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
-from db.models.main_windows import windows_day, windows_day_time
+from db.models.main_windows import (windows_day, windows_day_time, 
+                                    price_list_load, price_list_add, 
+                                    price_list_check, price_list_update, price_list_delete,
+                                    price_list_select_user)
 from db.models.user import update_last_visit_user, add_record_user, check_record_time
 from db.models.admin import select_day_time, update_windows_day, admin_delete_windows_day
 from utils.ip_address import get_ip
@@ -27,6 +30,11 @@ class ToDay(BaseModel):
     
 class TimeDay(BaseModel):
     time: str
+    
+class PriceItem(BaseModel):
+    id: int
+    name: str
+    price: int
 
 templates_main = Jinja2Templates(directory=r"./templates/main")
 templates_auth = Jinja2Templates(directory=r"./templates/auth")
@@ -157,13 +165,15 @@ async def pricelist_get(request: Request, username: int, user: dict = Depends(ge
             userP = "users/" + str(username)
             admin_or_user = 'user'
             price_html = 'pricelistuser.html'
+            pl_user = await price_list_select_user()
     
         return templates_main.TemplateResponse(
             price_html,
             {
                 "request": request,
                 "user": userP,
-                "admin_or_user": admin_or_user
+                "admin_or_user": admin_or_user,
+                "price_list_user": pl_user
             }
         )
     else:
@@ -176,3 +186,40 @@ async def save_ip(request: Request, user: dict = Depends(get_current_user)):
     asyncio.create_task(get_ip(data, user))
     
     return {"status": "success"}
+
+
+@router.post('/api/price-load-items')
+async def price_load_post():
+    
+    price_list = await price_list_load()
+    pl_list = []
+    for pl in price_list:
+        pl_dict = {
+            'id': pl['id_name'],
+            'name': pl['name'],
+            'price': pl['price']
+        }
+        pl_list.append(pl_dict)
+    
+    return JSONResponse(content=pl_list)
+    
+
+@router.post('/api/price-items')
+async def price_save_post(data: PriceItem):
+    
+    if await price_list_check(data.id):
+        await price_list_update(data.id, data.name, data.price)
+    else:
+        await price_list_add(data.id, data.name, data.price)
+    
+    return JSONResponse(content={'status': True})
+
+
+@router.delete('/api/price-items/{itemId}')
+async def price_delete(itemId: int, user: dict = Depends(get_current_user)):
+    
+    if user in [1387002896, 1563475165]:
+        await price_list_delete(itemId)
+        return JSONResponse(content={'status': True})
+    else:
+        return JSONResponse(content={'status': False}, status_code=403)

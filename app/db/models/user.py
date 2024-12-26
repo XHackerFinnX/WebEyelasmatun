@@ -4,6 +4,7 @@ from db.database import User
 User = User()
 
 async def select_profile_user(id_user: int):
+    
     query = """
     SELECT
         id,
@@ -92,3 +93,37 @@ async def update_telephone_user(telephone: str, id_user: int):
             await conn.execute(query, telephone, id_user)
     except Exception as error:
         print(f"Ошибка обновления номера телефона: {error}")
+        
+        
+async def add_record_user(id_user: int, date, time, comment_user, status: bool):
+    
+    query = """
+    INSERT INTO record_user (id, date, time, comment_user, status)
+    VALUES ($1, $2, $3, $4, $5)
+    """
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            await conn.execute(query, id_user, date, time.isoformat(), comment_user, status)
+            return True
+    except Exception as error:
+        print(f"Ошибка добавление записи клиента: {error}")
+        return None
+    
+
+async def check_record_time(id_user: int, date, time):
+    
+    query = """
+    SELECT id
+    FROM record_user
+    WHERE id = $1 AND date = $2 AND time = $3
+    """
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            check_time = await conn.fetch(query, id_user, date, time.isoformat())
+
+            return check_time if check_time else None
+    except Exception as error:
+        print(f"Ошибка проверки записи на это время: {error}")
+        return None

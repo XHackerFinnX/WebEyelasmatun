@@ -4,10 +4,12 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 from routers.auth_rout import get_current_user
 from collections import namedtuple
-from datetime import datetime
+from datetime import datetime, timedelta
 from db.models.user import (update_name_user, update_telegram_user,
                             update_telephone_user, select_profile_user,
                             select_record_user, delete_record_user)
+from db.models.main_windows import windows_day_time, update_time_in_day
+from db.models.admin import admin_add_windows_day
 
 import asyncio
 
@@ -122,13 +124,27 @@ async def delete_record_post(data_delete: DeleteRecordUser, user: dict = Depends
         if user != int(data.id):
             return JSONResponse(content={'status': False}, status_code=403)
         
+        date_today = datetime.now() + timedelta(days=3)
         date_r = datetime.strptime(data.date, "%d.%m.%Y")
         time_r = datetime.strptime(data.time, '%H:%M')
         date_full = datetime.combine(date_r, time_r.time()).isoformat()
         
-        if await delete_record_user(int(data.id), date_r, date_full):
-            
-            return JSONResponse(content={'status': True})
+        if date_r > date_today:
+        
+            if await delete_record_user(int(data.id), date_r, date_full):
+                
+                times = await windows_day_time(date_r)
+                
+                if times is None:
+                    await admin_add_windows_day(date_r, [data.time])
+                    
+                else:
+                    times_list = times['time']
+                    times_list.append(data.time)
+                    
+                    await update_time_in_day(date_r, sorted(times_list))
+                
+                return JSONResponse(content={'status': True})
         
         else:
             return JSONResponse(content={'status': False}, status_code=403)

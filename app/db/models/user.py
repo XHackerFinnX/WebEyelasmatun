@@ -153,7 +153,6 @@ async def delete_record_user(id_user: int, date, time):
     WHERE id = $1 AND date = $2 AND time = $3
     """
     try:
-        print(id_user, date, time)
         pool = await User.connect()
         async with pool.acquire() as conn:
             await conn.execute(query, id_user, date, time)

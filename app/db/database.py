@@ -23,16 +23,21 @@ class Windows:
     def __init__(self):
         self._connection = None
         
-    def _connect(self):
-        if not self._connection or self._connection.closed:
-            self._connection = psycopg2.connect(
+    async def connect(self):
+        if not self._pool:
+            self._pool = await asyncpg.create_pool(
                 host=config.POSTGRESQL_HOST.get_secret_value(),
                 database=config.POSTGRESQL_DATABASE.get_secret_value(),
                 user=config.POSTGRESQL_USER.get_secret_value(),
                 password=config.POSTGRESQL_PASSWORD.get_secret_value(),
-                port=config.POSTGRESQL_PORT.get_secret_value()
+                port=config.POSTGRESQL_PORT.get_secret_value(),
             )
-        return self._connection
+        return self._pool
+
+    async def close(self):
+        if self._pool:
+            await self._pool.close()
+            self._pool = None
     
     
 class Admin:

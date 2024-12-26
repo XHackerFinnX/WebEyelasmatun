@@ -44,5 +44,13 @@ async def update_time_in_day(date, time):
     
     query = """
     UPDATE windows
-    SET time = %s
+    SET time = $1
+    WHERE date = $2
     """
+    
+    try:
+        pool = await Win.connect()
+        async with pool.acquire() as conn:
+            await conn.execute(query, time, date)
+    except Exception as error:
+        print(f"Ошибка обновления времени для окошка: {error}")

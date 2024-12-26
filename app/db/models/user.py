@@ -134,7 +134,7 @@ async def select_record_user(id_user: int):
     query = """
     SELECT id, date, time, comment_user
     FROM record_user
-    WHERE id = $1
+    WHERE id = $1 AND status = true
     """
     try:
         pool = await User.connect()

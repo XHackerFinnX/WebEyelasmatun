@@ -95,7 +95,7 @@ async def record_user_post(data: RecordUser, user: dict = Depends(get_current_us
 
         data_user_record = await select_record_user(data.userId)
         if not data_user_record:
-            return JSONResponse(content={'status': False}, status_code=404)
+            return JSONResponse(content={'status': False})
         
         data_list = [
             {

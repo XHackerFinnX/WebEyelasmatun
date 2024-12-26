@@ -62,17 +62,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchAppointments(date) {
-        // Здесь должен быть реальный API-запрос
-        // Сейчас это просто имитация с задержкой
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve([
-                    {id: 1, time: '10:00', clientName: 'Анна Иванова', telegramUsername: '@anna_iv', comment: 'Небольшие, короткие, мини, легкие тексты для чтения со школьниками. Детские тексты, тексты с простыми словами, любые тексты для детей.\nСтраницы отсортированы по длине текста. под индексом 1 - идут самые короткие тексты, под индексом 40 - длинные тексты.' },
-                    {id: 2, time: '11:30', clientName: 'Петр Сидоров', telegramUsername: '@petr_s', comment: 'Коррекция' },
-                    {id: 3, time: '14:00', clientName: 'Мария Петрова', telegramUsername: '@maria_p', comment: 'Снятие' },
-                ]);
-            }, 500);
-        });
+        const formattedDate = formatDate(date);
+        const url = '/api/appointments-schedule';
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ date: formattedDate }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const appointments = await response.json();
+            return appointments;
+        } catch (error) {
+            console.error('Error fetching appointments:', error);
+            return [];
+        }
     }
 
     async function updateAppointments() {
@@ -141,4 +152,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateAppointments();
 });
-

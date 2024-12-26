@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 from routers.auth_rout import get_current_user
-from datetime import datetime, timedelta
+from collections import namedtuple
+from datetime import datetime
 from db.models.user import (update_name_user, update_telegram_user,
-                            update_telephone_user, select_profile_user)
+                            update_telephone_user, select_profile_user,
+                            select_record_user, delete_record_user)
 
 import asyncio
 import random
@@ -19,6 +21,12 @@ router = APIRouter(
 class UpdateUser(BaseModel):
     name: str
     update_name: str
+    
+class RecordUser(BaseModel):
+    userId: int
+    
+class DeleteRecordUser(BaseModel):
+    appointmentId: str
 
 
 templates_user = Jinja2Templates(directory=r"./templates/user")
@@ -75,3 +83,57 @@ async def update_users_post(request: Request, data_user: UpdateUser, users: int 
     
     else:
         return templates_auth.TemplateResponse("auth.html", {"request": request})
+    
+    
+@router.post('/record_user')
+async def record_user_post(data: RecordUser, user: dict = Depends(get_current_user)):
+    
+    try:
+        # Проверка соответствия пользователя
+        if user != data.userId:
+            return JSONResponse(content={'status': False}, status_code=403)
+
+        data_user_record = await select_record_user(data.userId)
+        if not data_user_record:
+            return JSONResponse(content={'status': False}, status_code=404)
+        
+        data_list = [
+            {
+                'id': dur['id'],
+                'date': dur['date'].strftime("%d.%m.%Y"),
+                'time': dur['time'].split('T')[1][:-3],
+                'comment': dur['comment_user'],
+            }
+            for dur in data_user_record
+        ]
+        
+        return JSONResponse(content={'status': True, 'data': data_list})
+    except Exception as e:
+        print(f"Ошибка в обработке записи пользователя: {e}")
+        return JSONResponse(content={'status': False, 'error': str(e)}, status_code=500)
+    
+    
+@router.post('/delete_record')
+async def delete_record_post(data_delete: DeleteRecordUser, user: dict = Depends(get_current_user)):
+    
+    try:
+        await asyncio.sleep(2)
+        Data = namedtuple('Data', ['id', 'date', 'time'])
+        data = Data(*data_delete.appointmentId.split('-'))
+
+        if user != int(data.id):
+            return JSONResponse(content={'status': False}, status_code=403)
+        
+        date_r = datetime.strptime(data.date, "%d.%m.%Y")
+        time_r = datetime.strptime(data.time, '%H:%M')
+        date_full = datetime.combine(date_r, time_r.time()).isoformat()
+        
+        if await delete_record_user(int(data.id), date_r, date_full):
+            
+            return JSONResponse(content={'status': True})
+        
+        else:
+            return JSONResponse(content={'status': False}, status_code=403)
+    except Exception as e:
+        print(f"Ошибка в обработке записи пользователя: {e}")
+        return JSONResponse(content={'status': False, 'error': str(e)}, status_code=500)

@@ -10,7 +10,6 @@ from db.models.user import (update_name_user, update_telegram_user,
                             select_record_user, delete_record_user)
 
 import asyncio
-import random
 
 router = APIRouter(
     prefix="",
@@ -89,7 +88,6 @@ async def update_users_post(request: Request, data_user: UpdateUser, users: int 
 async def record_user_post(data: RecordUser, user: dict = Depends(get_current_user)):
     
     try:
-        # Проверка соответствия пользователя
         if user != data.userId:
             return JSONResponse(content={'status': False}, status_code=403)
 

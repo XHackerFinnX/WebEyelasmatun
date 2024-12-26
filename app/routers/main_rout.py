@@ -64,7 +64,7 @@ async def main_get(request: Request, user: dict = Depends(get_current_user)):
 @router.post('/date_record')
 async def date_record(tod: ToDay, user: dict = Depends(get_current_user)):
     
-    dates = [(d[0] - timedelta(days=1)).strftime("%Y-%m-%d") for d in await windows_day()]
+    dates = [(d['date'] - timedelta(days=1)).strftime("%Y-%m-%d") for d in await windows_day()]
     date_today = datetime.now()
     
     asyncio.create_task(update_last_visit_user(date_today, user))
@@ -76,8 +76,8 @@ async def date_record(tod: ToDay, user: dict = Depends(get_current_user)):
 async def time_record(timeday: TimeDay):
     
     times = await windows_day_time(datetime.strptime(timeday.time, "%Y-%m-%d") + timedelta(days=1))
-    
-    return JSONResponse(content={"times_r": times})
+
+    return JSONResponse(content={"times_r": times['time']})
 
     
 @router.post('/record')

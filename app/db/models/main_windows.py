@@ -12,11 +12,11 @@ async def windows_day():
     FROM windows
     WHERE date >= %s
     """
-    
+
     try:
         with Win._connect() as conn:
             with conn.cursor() as cursor:
-                cursor.execute(query, (datetime.today(),))
+                cursor.execute(query, (datetime.today().date(),))
                 day = cursor.fetchall()
             conn.commit()
     except (InterfaceError, Error) as error:

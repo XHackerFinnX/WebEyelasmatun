@@ -7,7 +7,9 @@ from routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
 from db.models.admin import (admin_add_windows_day, check_windows_day,
                              update_windows_day, admin_delete_windows_day,
-                             schedule_record_user, admin_list, select_user_all)
+                             schedule_record_user, admin_list, select_user_all,
+                             black_list_user, select_user_all_blacklist_true,
+                             select_user_all_blacklist_false)
 
 import asyncio
 
@@ -211,8 +213,8 @@ async def schedule_user(request: Request, data: ScheduleDate, user: dict = Depen
         return JSONResponse(content={'status': False}, status_code=401)
     
 
-@router.post('/api/clients-all')
-async def clients_all_post(request: Request, user: dict = Depends(get_current_user)):
+@router.post('/api/clients-all/{name}')
+async def clients_all_post(request: Request, name: str, user: dict = Depends(get_current_user)):
     
     admin_list_super = [i[0] for i in await admin_list('superadmin')]
     admin_list_normal = [i[0] for i in await admin_list('admin')]
@@ -220,7 +222,13 @@ async def clients_all_post(request: Request, user: dict = Depends(get_current_us
     
     if user in admin_list_full:
         
-        ul = await select_user_all()
+        if name == 'sms':
+            ul = await select_user_all()
+        elif name == 'blf':
+            ul = await select_user_all_blacklist_true()
+        elif name == 'blt':
+            ul = await select_user_all_blacklist_false()
+        
         user_list = []
         for i in ul:
             user_dict = {
@@ -297,8 +305,7 @@ async def blacklist_true_user(request: Request, data: BlackList, user: dict = De
     admin_list_full = admin_list_super + admin_list_normal
     
     if user in admin_list_full:
-        
-        print(data)
+        await black_list_user(data.clientId, True)
         
         return JSONResponse(content={'status': True})
         
@@ -319,8 +326,7 @@ async def blacklist_true_user(request: Request, data: BlackList, user: dict = De
     admin_list_full = admin_list_super + admin_list_normal
     
     if user in admin_list_full:
-        
-        print(data)
+        await black_list_user(data.clientId, False)
         
         return JSONResponse(content={'status': True})
         

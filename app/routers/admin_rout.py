@@ -7,7 +7,7 @@ from routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
 from db.models.admin import (admin_add_windows_day, check_windows_day,
                              update_windows_day, admin_delete_windows_day,
-                             schedule_record_user, admin_list)
+                             schedule_record_user, admin_list, select_user_all)
 
 import asyncio
 
@@ -25,6 +25,10 @@ class DelDay(BaseModel):
     
 class ScheduleDate(BaseModel):
     date: str
+    
+class SmsUser(BaseModel):
+    clientId: int
+    message: str
 
 
 templates_admin = Jinja2Templates(directory=r"./templates/admin")
@@ -192,5 +196,49 @@ async def schedule_user(data: ScheduleDate, user: dict = Depends(get_current_use
                 user_schedule_list.append(user_dict)
                 
             return JSONResponse(content=user_schedule_list)
+    else:
+        return JSONResponse(content={'status': False}, status_code=401)
+    
+
+@router.post('/api/clients-all')
+async def clients_all_post(user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    admin_list_full = admin_list_super + admin_list_normal
+    
+    if user in admin_list_full:
+        
+        ul = await select_user_all()
+        user_list = []
+        for i in ul:
+            user_dict = {
+                'id': i[0],
+                'name': i[1],
+                'telegram': i[2],
+                'phone': i[3]
+            }
+            user_list.append(user_dict)
+        
+        
+        return JSONResponse(content=user_list)
+        
+    else:
+        return JSONResponse(content={'status': False}, status_code=401)
+    
+
+@router.post('/api/send-message')
+async def send_message_user_post(data: SmsUser, user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    admin_list_full = admin_list_super + admin_list_normal
+    
+    if user in admin_list_full:
+        
+        print(data)
+        
+        return JSONResponse(content={'status': True})
+        
     else:
         return JSONResponse(content={'status': False}, status_code=401)

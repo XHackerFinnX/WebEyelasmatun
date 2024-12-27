@@ -370,3 +370,28 @@ async def update_history_user_money(id_user: int, date, time, money: int):
             Admin._connection.close()
                 
         return
+    
+
+async def select_date_money(start_date, end_date):
+    
+    query = """
+    SELECT date, SUM(money)
+    FROM record_user
+    WHERE status = false
+    AND date >= %s AND date <= %s
+    GROUP BY date
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (start_date, end_date))
+                date_money = cursor.fetchall()
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка получения date и money {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return date_money

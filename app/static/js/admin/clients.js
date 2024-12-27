@@ -1,11 +1,3 @@
-// Sample client data
-const clients = [
-    { id: 1, name: "Иван Иванов", telegram: "@ivan", phone: "+7 (999) 123-45-67" },
-    { id: 222, name: "Мария Петрова", telegram: "@maria", phone: "+7 (999) 234-56-78" },
-    { id: 23, name: "Алексей Сидоров", telegram: "@alex", phone: "+7 (999) 345-67-89" },
-    { id: 224, name: "Елена Козлова", telegram: "@elena", phone: "+7 (999) 456-78-90" },
-];
-
 const clientList = document.getElementById('clientList');
 const searchInput = document.getElementById('searchInput');
 const modal = document.getElementById('modal');
@@ -15,6 +7,24 @@ const closeButton = document.getElementById('closeButton');
 const historyButton = document.getElementById('historyButton');
 const closeHistoryButton = document.getElementById('closeHistoryButton');
 const historyTableBody = document.getElementById('historyTableBody');
+
+async function fetchClients() {
+    try {
+        const response = await fetch('/api/clients-all/all', {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        clients = await response.json();
+        populateClientList(clients);
+    } catch (error) {
+        console.error('Ошибка при выборке клиентов:', error);
+        clientList.innerHTML = '<p>Ошибка при загрузке клиентов. Пожалуйста, повторите попытку позже.</p>';
+    }
+}
 
 // Populate client list
 function populateClientList(clients) {
@@ -37,10 +47,10 @@ function populateClientList(clients) {
 function filterClients() {
     const searchTerm = searchInput.value.toLowerCase();
     const filteredClients = clients.filter(client => 
-        client.id.toString().includes(searchTerm) ||
-        client.name.toLowerCase().includes(searchTerm) ||
-        client.telegram.toLowerCase().includes(searchTerm) ||
-        client.phone.includes(searchTerm)
+        (client.id && client.id.toString().includes(searchTerm)) ||
+        (client.name && client.name.toLowerCase().includes(searchTerm)) ||
+        (client.telegram && client.telegram.toLowerCase().includes(searchTerm)) ||
+        (client.phone && client.phone.includes(searchTerm))
     );
     populateClientList(filteredClients);
 }
@@ -79,21 +89,25 @@ async function openModal(clientId) {
 
 // Симуляция получения информации о клиенте
 async function fetchClientInfo(clientId) {
-    // В реальном приложении здесь был бы запрос к серверу
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve({
-                lastVisit: '2023-06-15',
-                lastAppointment: '2023-06-10',
-                visitCount: 5,
-                cancelCount: 1,
-                isBlacklisted: Math.random() < 0.5, // Случайное значение для демонстрации
-                ipAddress: Math.random() < 0.7 ? '192.168.1.1' : null, // Симуляция возможного отсутствия IP
-                country: 'Россия',
-                city: 'Москва'
-            });
-        }, 500);
-    });
+    try {
+        const response = await fetch(`/api/client-info/${clientId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Ошибка при получении информации о клиенте');
+        }
+
+        const clientInfo = await response.json();
+
+        return clientInfo;
+    } catch (error) {
+        console.error('Ошибка при выполнении POST запроса:', error);
+        return null; // Возвращаем null в случае ошибки
+    }
 }
 
 // Close modal
@@ -105,7 +119,8 @@ function closeModal() {
 async function openHistoryModal() {
     const clientId = clientIdSpan.textContent.split(' ')[1];
     history = await fetchVisitHistory(clientId);
-    populateHistoryTable(history);
+    adminstatus = await selectNameAdmin();
+    populateHistoryTable(history, adminstatus);
     historyModal.style.display = 'block';
 }
 
@@ -114,40 +129,78 @@ function closeHistoryModal() {
     historyModal.style.display = 'none';
 }
 
-// Fetch visit history
 async function fetchVisitHistory(clientId) {
-    // В реальном приложении здесь был бы запрос к серверу
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve([
-                { date: '11.11.2024', time: '14:30', dayOfWeek: 'Четверг', comment: 'Стандартная процедура', money: 1500 },
-                { date: '14.11.2024', time: '11:00', dayOfWeek: 'Суббота', comment: 'Клиент опоздал на 15 минут', money: 1800 },
-                { date: '18.11.2024', time: '16:45', dayOfWeek: 'Воскресенье', comment: 'Дополнительная услуга: окрашивание', money: 2500 },
-                { date: '12.12.2024', time: '10:15', dayOfWeek: 'Понедельник', comment: 'Первое посещение, консультация', money: 1000 },
-                { date: '15.12.2024', time: '13:00', dayOfWeek: 'Вторник', comment: 'Отменен клиентом в последний момент', money: 0 },
-                { date: '15.12.2024', time: '13:00', dayOfWeek: 'Вторник', comment: 'Отменен клиентом в последний момент', money: 0 },
-                { date: '15.12.2024', time: '13:00', dayOfWeek: 'Вторник', comment: 'Отменен клиентом в последний момент', money: 0 },
-            ]);
-        }, 500);
-    });
+    try {
+        const response = await fetch(`/api/visit-history/${clientId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ошибка при получении истории посещений: ${response.statusText}`);
+        }
+
+        const visitHistory = await response.json();
+        return visitHistory;
+    } catch (error) {
+        console.error('Ошибка при выполнении POST-запроса:', error);
+        return []; // Возвращаем пустой массив в случае ошибки
+    }
 }
 
-// Populate history table
-function populateHistoryTable(history) {
+async function selectNameAdmin() {
+    try {
+        const response = await fetch('/api/usedby_admin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ошибка при получении статуса админа: ${response.statusText}`);
+        }
+
+        const adminName = await response.json();
+        console.log(adminName.status);
+        return adminName.status;
+    } catch (error) {
+        console.error('Ошибка при выполнении POST-запроса:', error);
+    }
+}
+
+function populateHistoryTable(history, adminstatus) {
     historyTableBody.innerHTML = '';
     const clientId = clientIdSpan.textContent.split(' ')[1];
-    history.forEach((visit, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td data-label="Дата">${visit.date} (${visit.dayOfWeek})</td>
-            <td data-label="Время">${visit.time}</td>
-            <td data-label="Комментарий" contenteditable="true">${visit.comment}</td>
-            <td data-label="Деньги" contenteditable="true">${visit.money}</td>
-        `;
-        row.dataset.index = index;
-        row.dataset.clientId = clientId;
-        historyTableBody.appendChild(row);
-    });
+
+    if (adminstatus === 'admin') {
+        history.forEach((visit, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td data-label="Дата">${visit.date} (${visit.dayOfWeek})</td>
+                <td data-label="Время">${visit.time}</td>
+                <td data-label="Комментарий" contenteditable="true">${visit.comment}</td>
+            `;
+            row.dataset.index = index;
+            row.dataset.clientId = clientId;
+            historyTableBody.appendChild(row);
+        });
+    } else {
+        history.forEach((visit, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td data-label="Дата">${visit.date} (${visit.dayOfWeek})</td>
+                <td data-label="Время">${visit.time}</td>
+                <td data-label="Комментарий" contenteditable="true">${visit.comment}</td>
+                <td data-label="Деньги" contenteditable="true">${visit.money}</td>
+            `;
+            row.dataset.index = index;
+            row.dataset.clientId = clientId;
+            historyTableBody.appendChild(row);
+        });
+    }
 
     // Add event listeners for editing
     historyTableBody.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
@@ -156,7 +209,7 @@ function populateHistoryTable(history) {
 }
 
 // Handle cell edits
-function handleCellEdit(event) {
+async function handleCellEdit(event) {
     const cell = event.target;
     const row = cell.closest('tr');
     const index = parseInt(row.dataset.index);
@@ -168,13 +221,31 @@ function handleCellEdit(event) {
     const updatedVisit = { ...history[index], [field.toLowerCase()]: newValue };
     history[index] = updatedVisit;
 
-    // Log the change to the console
-    console.log(`Изменение в записи:`, {
+    const requestData = {
         clientId: clientId,
         date: updatedVisit.date,
         time: updatedVisit.time,
-        [field]: newValue
-    });
+        update: [field, newValue]
+    };
+
+    console.log(`Изменение в записи:`, requestData);
+
+    try {
+        const response = await fetch('/api/update-visit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData) // Отправка данных в формате JSON
+        });
+
+        if (!response.ok) {
+            throw new Error(`Ошибка при обновлении записи: ${response.statusText}`);
+        }
+
+    } catch (error) {
+        console.error('Ошибка при выполнении POST-запроса:', error);
+    }
 }
 
 // Sort history table
@@ -246,7 +317,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-
 window.onclick = function(event) {
     if (event.target == modal) {
         closeModal();
@@ -255,17 +325,8 @@ window.onclick = function(event) {
     }
 }
 
-// Initial population of client list
-populateClientList(clients);
-
+fetchClients();
 let history = [];
-
-
-
-
-
-
-
 
 document.addEventListener('DOMContentLoaded', () => {
     const sortIcons = document.querySelectorAll('.sort-icon');
@@ -275,19 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.addEventListener('click', () => {
             const sortType = icon.dataset.sort;
             const directionIcon = icon.nextElementSibling;
-
-            // if (currentSort === sortType) {
-            //     // Toggle direction
-            //     directionIcon.classList.toggle('desc');
-            //     console.log('выкл');
-            // } else {
-            //     // Reset all icons
-            //     sortIcons.forEach(i => i.nextElementSibling.classList.remove('active', 'desc'));
-            //     // Set new sort
-            //     directionIcon.classList.add('active');
-            //     currentSort = sortType;
-            //     console.log('вкл')
-            // }
             directionIcon.classList.toggle('desc');
             // Your sorting logic here
             console.log(`Sorting by ${sortType}, direction: ${directionIcon.classList.contains('desc') ? 'descending' : 'ascending'}`);

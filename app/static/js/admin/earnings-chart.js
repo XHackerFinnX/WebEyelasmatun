@@ -118,6 +118,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateTable(labels, data) {
         const tableBody = document.querySelector('#earningsTable tbody');
         tableBody.innerHTML = '';
+
+        let totalEarnings = 0;
+
         for (let i = 0; i < labels.length; i++) {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -125,7 +128,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${data[i].toLocaleString('ru-RU')} ₽</td>
             `;
             tableBody.appendChild(row);
+
+            totalEarnings += data[i];
         }
+
+        // Добавляем строку для отображения общей суммы внизу таблицы
+        const totalRow = document.createElement('tr');
+        totalRow.innerHTML = `
+            <td><strong>Итого:</strong></td>
+            <td><strong>${totalEarnings.toLocaleString('ru-RU')} ₽</strong></td>
+        `;
+        tableBody.appendChild(totalRow);
     }
 
     // Fetch data from server
@@ -174,7 +187,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 endDate = new Date(selectedDate.getFullYear(), 11, 31);
                 break;
         }
-        console.log(startDate.getDate(), startDate.getMonth()+1, startDate.getFullYear());
         const data = await fetchData(startDate, endDate);
         createChart(data.labels, data.earnings);
         updateTable(data.labels, data.earnings);

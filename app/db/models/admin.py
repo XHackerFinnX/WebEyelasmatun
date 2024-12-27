@@ -185,3 +185,71 @@ async def select_user_all():
             Admin._connection.close()
                 
         return user_list
+    
+    
+async def select_user_all_blacklist_false():
+    
+    query = """
+    SELECT id, name, telegram, telephone
+    FROM profile_user
+    WHERE blacklist = false
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query)
+                user_list = cursor.fetchall()
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка получения клиентов не в ЧС {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return user_list
+    
+    
+async def select_user_all_blacklist_true():
+    
+    query = """
+    SELECT id, name, telegram, telephone
+    FROM profile_user
+    WHERE blacklist = true
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query)
+                user_list = cursor.fetchall()
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка получения клиентов в ЧС {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return user_list
+    
+
+async def black_list_user(id_user: int, status: bool):
+    
+    query = """
+    UPDATE profile_user
+    SET blacklist = %s
+    WHERE id = %s
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (status, id_user))
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка обновления ЧС клиента {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return

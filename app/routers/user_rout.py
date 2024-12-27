@@ -87,9 +87,14 @@ async def update_users_post(request: Request, data_user: UpdateUser, users: int 
     
     
 @router.post('/record_user')
-async def record_user_post(data: RecordUser, user: dict = Depends(get_current_user)):
+async def record_user_post(request: Request, data: RecordUser, user: dict = Depends(get_current_user)):
     
     try:
+        if user:
+            pass
+        else:
+            return templates_auth.TemplateResponse("auth.html", {"request": request})
+        
         if user != data.userId:
             return JSONResponse(content={'status': False}, status_code=403)
 
@@ -114,9 +119,14 @@ async def record_user_post(data: RecordUser, user: dict = Depends(get_current_us
     
     
 @router.post('/delete_record')
-async def delete_record_post(data_delete: DeleteRecordUser, user: dict = Depends(get_current_user)):
+async def delete_record_post(request: Request, data_delete: DeleteRecordUser, user: dict = Depends(get_current_user)):
     
     try:
+        if user:
+            pass
+        else:
+            return templates_auth.TemplateResponse("auth.html", {"request": request})
+        
         await asyncio.sleep(2)
         Data = namedtuple('Data', ['id', 'date', 'time'])
         data = Data(*data_delete.appointmentId.split('-'))

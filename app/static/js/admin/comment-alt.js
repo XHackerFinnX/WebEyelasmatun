@@ -11,7 +11,7 @@ let clients = [];
 // Fetch client data
 async function fetchClients() {
     try {
-        const response = await fetch('/api/clients-all', {
+        const response = await fetch('/api/clients-all/sms', {
             method: 'POST'
         });
 

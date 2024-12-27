@@ -25,7 +25,7 @@ function populateClientList(clients) {
 
 async function fetchClients() {
     try {
-        const response = await fetch('/api/clients-all', {
+        const response = await fetch('/api/clients-all/blf', {
             method: 'POST'
         });
 

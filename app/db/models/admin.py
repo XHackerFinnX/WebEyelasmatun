@@ -163,3 +163,25 @@ async def schedule_record_user(date):
             Admin._connection.close()
                 
         return user_list
+    
+
+async def select_user_all():
+    
+    query = """
+    SELECT id, name, telegram, telephone
+    FROM profile_user
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query)
+                user_list = cursor.fetchall()
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка получения клиентов {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return user_list

@@ -49,3 +49,28 @@ async def update_authentication(username: int, status: bool, last_date):
     finally:
         if Auth._connection:
             Auth._connection.close()
+            
+
+async def status_authentication(username: int, password: str):
+    
+    query = """
+    SELECT blacklist FROM (SELECT a.login, p.blacklist
+    FROM authentication AS a
+    JOIN profile_user AS p
+    ON a.login = p.id
+    WHERE a.login = %s AND a.password = %s)
+    """
+    
+    try:
+        with Auth._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (username, password))
+                status = cursor.fetchone()
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка проверки статуса пользователя аутентификация {error}")
+    finally:
+        if Auth._connection:
+            Auth._connection.close()
+                
+        return status

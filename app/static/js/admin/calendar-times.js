@@ -5,13 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.getElementsByClassName('close')[0];
     const clientAppointments = document.getElementById('clientAppointments');
 
-    // Пример данных клиентов (в реальном приложении эти данные должны загружаться с сервера)
-    const clients = [
-        { id: 1, name: 'Иван Иванов', telegram: '@ivanov', phone: '+7 (999) 123-45-67' },
-        { id: 2, name: 'Мария Петрова', telegram: '@petrova', phone: '+7 (999) 234-56-78' },
-        // Добавьте больше клиентов по необходимости
-    ];
-
     // Функция для отображения клиентов
     function displayClients(clientsToShow) {
         clientsList.innerHTML = '';
@@ -29,27 +22,60 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    async function fetchClients() {
+        try {
+            const response = await fetch('/api/clients-all/del', {
+                method: 'POST'
+            });
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
+            clients = await response.json();
+            displayClients(clients);
+        } catch (error) {
+            console.error('Ошибка при выборке клиентов:', error);
+        }
+    }
+
     // Отображаем всех клиентов при загрузке страницы
-    displayClients(clients);
+    fetchClients()
 
     // Обработка поиска
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
-        const filteredClients = clients.filter(client => 
-            client.name.toLowerCase().includes(searchTerm) ||
-            client.telegram.toLowerCase().includes(searchTerm) ||
-            client.phone.includes(searchTerm)
-        );
+        const filteredClients = clients.filter(client => {
+            const id_n = client.id ? String(client.id) : '';
+            const name = client.name ? client.name.toLowerCase() : '';
+            const telegram = client.telegram ? client.telegram.toLowerCase() : '';
+            const phone = client.phone ? client.phone : '';
+
+            return (
+                id_n.includes(searchTerm) ||
+                name.includes(searchTerm) ||
+                telegram.includes(searchTerm) ||
+                phone.includes(searchTerm)
+            );
+        });
         displayClients(filteredClients);
     });
 
     // Функция для отображения записей клиента
-    function showClientAppointments(client) {
+    async function showClientAppointments(client) {
         // В реальном приложении здесь должен быть запрос к серверу для получения записей клиента
-        const appointments = [
-            { id: 1, date: '2023-06-01', time: '10:00', comment: 'Первый визит' },
-            { id: 2, date: '2023-06-15', time: '15:30', comment: 'Повторный визит' },
-        ];
+        console.log(client.id);
+
+        const response = await fetch(`/record_user/admin/${client.id}`, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const appointments = await response.json();
+        console.log(appointments);
 
         clientAppointments.innerHTML = '';
         appointments.forEach(appointment => {
@@ -60,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="appointment-date-time">${appointment.date} | ${appointment.time}</div>
                     <div class="appointment-comment">${appointment.comment}</div>
                 </div>
-                <button class="delete-btn" data-id="${appointment.id}">
+                <button class="delete-btn" data-id="${appointment.id}-${appointment.date}-${appointment.time}">
                     <i class="fas fa-trash"></i>
                 </button>
             `;
@@ -79,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Обработка удаления записи
-    clientAppointments.addEventListener('click', (e) => {
+    clientAppointments.addEventListener('click', async (e) => {
         if (e.target.closest('.delete-btn')) {
             const button = e.target.closest('.delete-btn');
             const appointmentId = button.dataset.id;
@@ -89,12 +115,31 @@ document.addEventListener('DOMContentLoaded', () => {
             button.innerHTML = '<div class="loading"></div>';
             button.disabled = true;
 
-            // Имитация запроса к серверу
-            setTimeout(() => {
-                // В реальном приложении здесь должен быть запрос к серверу для удаления записи
+            try {
+                // Отправка POST запроса на сервер для удаления записи
+                const response = await fetch('/delete_appointment_record_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ appointmentId }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка удаления записи');
+                }
+
+                // Удаляем элемент из DOM
                 appointmentElement.remove();
                 alert('Запись успешно удалена');
-            }, 1000);
+            } catch (error) {
+                console.error('Ошибка при удалении записи:', error);
+                alert('Не удалось удалить запись. Попробуйте снова.');
+            } finally {
+                // Восстанавливаем кнопку
+                button.innerHTML = '<i class="fas fa-trash"></i>';
+                button.disabled = false;
+            }
         }
     });
 });

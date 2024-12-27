@@ -11,7 +11,7 @@ from db.models.admin import (admin_add_windows_day, check_windows_day,
                              black_list_user, select_user_all_blacklist_true,
                              select_user_all_blacklist_false, select_user_all_delete,
                              select_user, select_history_user, update_history_user_comment_admin,
-                             update_history_user_money)
+                             update_history_user_money, select_date_money)
 from db.models.user import select_record_user, delete_record_user
 from db.models.main_windows import update_time_in_day, windows_day_time
 from collections import namedtuple
@@ -52,6 +52,10 @@ class UpdateUserRecordAdmin(BaseModel):
     date: str
     time: str
     update: List[str]
+    
+class DateRange(BaseModel):
+    startDate: str
+    endDate: str
 
 
 templates_admin = Jinja2Templates(directory=r"./templates/admin")
@@ -567,3 +571,27 @@ async def usedby_admin_post(user: dict = Depends(get_current_user)):
     
     else:
         return JSONResponse(content='False')
+    
+    
+@router.post('/api/earnings')
+async def earnings_post(data: DateRange, user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    
+    if user in admin_list_super:
+        start_date = datetime.strptime(data.startDate.split('T')[0], '%Y-%m-%d')
+        end_date = datetime.strptime(data.endDate.split('T')[0], '%Y-%m-%d')
+
+        data_list = await select_date_money(start_date, end_date)
+        days = []
+        earnings = []
+        
+        for d, e in data_list:
+            days.append(d.strftime('%d.%m.%Y'))
+            earnings.append(e)
+        
+        return JSONResponse(content={"labels": days, "earnings": earnings})
+    
+    else:
+        return JSONResponse(content={'status': False})
+    

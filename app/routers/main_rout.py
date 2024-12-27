@@ -229,11 +229,16 @@ async def price_save_post(data: PriceItem):
 
 
 @router.delete('/api/price-items/{itemId}')
-async def price_delete(itemId: int, user: dict = Depends(get_current_user)):
+async def price_delete(request: Request, itemId: int, user: dict = Depends(get_current_user)):
     
     admin_list_super = [i[0] for i in await admin_list('superadmin')]
     admin_list_normal = [i[0] for i in await admin_list('admin')]
     admin_list_full = admin_list_super + admin_list_normal
+    
+    if user:
+        pass
+    else:
+        return templates_auth.TemplateResponse("auth.html", {"request": request})
     
     if user in admin_list_full:
         await price_list_delete(itemId)

@@ -65,10 +65,12 @@
                 <i class="fas fa-users"></i>
                 <span>Список клиентов</span>
             </div>
+            {% if status == 'superadmin' %}
             <div class="tile" id="earnings-chart">
                 <i class="fas fa-chart-bar"></i>
                 <span>График заработка</span>
             </div>
+            {% endif %}
         </div>
     </main>
 

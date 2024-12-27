@@ -9,11 +9,14 @@ from db.models.admin import (admin_add_windows_day, check_windows_day,
                              update_windows_day, admin_delete_windows_day,
                              schedule_record_user, admin_list, select_user_all,
                              black_list_user, select_user_all_blacklist_true,
-                             select_user_all_blacklist_false, select_user_all_delete)
+                             select_user_all_blacklist_false, select_user_all_delete,
+                             select_user, select_history_user, update_history_user_comment_admin,
+                             update_history_user_money)
 from db.models.user import select_record_user, delete_record_user
 from db.models.main_windows import update_time_in_day, windows_day_time
 from collections import namedtuple
 
+import calendar, locale
 import asyncio
 
 router = APIRouter(
@@ -43,12 +46,19 @@ class BlackList(BaseModel):
     
 class DeleteUserRecord(BaseModel):
     appointmentId: str
+    
+class UpdateUserRecordAdmin(BaseModel):
+    clientId: int
+    date: str
+    time: str
+    update: List[str]
 
 
 templates_admin = Jinja2Templates(directory=r"./templates/admin")
 templates_main = Jinja2Templates(directory=r"./templates/main")
 templates_auth = Jinja2Templates(directory=r"./templates/auth")
 
+locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 
 @router.get('/profile')
 async def profile_error_get(request: Request, user: dict = Depends(get_current_user)):
@@ -72,7 +82,13 @@ async def profile_admin_get(request: Request, admin: int | None = None, user: di
             if user == admin:
                 userP = "admin/" + str(admin)
                 
-                return templates_admin.TemplateResponse("admin.html", {"request": request, "user": userP})
+                if user in admin_list_super:
+                    stat = 'superadmin'
+    
+                elif user in admin_list_normal:
+                    stat = 'admin'
+                
+                return templates_admin.TemplateResponse("admin.html", {"request": request, "user": userP, "status" : stat})
             else:
                 return templates_main.TemplateResponse("error.html", {"request": request})
             
@@ -228,7 +244,7 @@ async def clients_all_post(request: Request, name: str, user: dict = Depends(get
     
     if user in admin_list_full:
         
-        if name == 'sms':
+        if name in ['sms', 'all']:
             ul = await select_user_all()
             
         elif name == 'blf':
@@ -249,7 +265,6 @@ async def clients_all_post(request: Request, name: str, user: dict = Depends(get
                 'phone': i[3]
             }
             user_list.append(user_dict)
-        
         
         return JSONResponse(content=user_list)
         
@@ -424,3 +439,131 @@ async def delete_appointment(request: Request, data: DeleteUserRecord, user: dic
     except Exception as e:
         print(f"Ошибка в обработке записи пользователя: {e}")
         return JSONResponse(content={'status': False, 'error': str(e)}, status_code=500)
+    
+
+@router.post('/api/client-info/{id_user}')
+async def client_info_post(id_user: int, user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    admin_list_full = admin_list_super + admin_list_normal
+    
+    if user not in admin_list_full:
+        return JSONResponse(content={'status': False}, status_code=403)
+    
+    data_user_list = await select_user(id_user)
+    
+    Data = namedtuple('Data', ['last_site_visit', 'last_entry', 'quantity_visits', 'quantity_cancel', 'blacklist', 'ip_address'])
+    data = Data(*data_user_list[0])
+    
+    if data.last_entry is None:
+        dle = 'нет'
+    else:
+        dle = data.last_entry.strftime('%d.%m.%Y %H:%M')
+        
+    if data.quantity_visits is None:
+        dqv = '0'
+    else:
+        dqv = data.quantity_visits
+        
+    if data.quantity_cancel is None:
+        dqc = '0'
+    else:
+        dqc = data.quantity_cancel
+    
+    data_dict = {
+        "lastVisit": data.last_site_visit.strftime('%d.%m.%Y %H:%M'),
+        "lastAppointment": dle,
+        "visitCount": dqv,
+        "cancelCount": dqc,
+        "isBlacklisted": data.blacklist,
+        "ipAddress": data.ip_address[0],
+        "country": data.ip_address[3],
+        "city": data.ip_address[1] + " " + data.ip_address[2]
+    }
+    
+    return JSONResponse(content=data_dict)
+
+
+@router.post('/api/visit-history/{id_user}')
+async def visit_history_user_post(id_user: int, user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    admin_list_full = admin_list_super + admin_list_normal
+    
+    if user not in admin_list_full:
+        return JSONResponse(content={'status': False}, status_code=403)
+    
+    history_user = await select_history_user(id_user)
+    hist_user_list = []
+
+    for hu in history_user:
+        
+        if hu[2] is None:
+            comment_a = '-'
+        else:
+            comment_a = hu[2]
+            
+        if hu[3] is None:
+            money = 0
+        else:
+            money = hu[3]
+            
+        weekd = hu[0].weekday()
+        
+        for i, name_w in enumerate(calendar.day_name):
+            if i == weekd:
+                name_week = name_w.capitalize()
+                break
+        
+        history_dict = {
+            "date": hu[0].strftime("%d.%m.%Y"),
+            "time": hu[1].split('T')[1][:-3],
+            "dayOfWeek": name_week,
+            "comment": comment_a,
+            "money": money
+        }
+        hist_user_list.append(history_dict)
+    
+    return JSONResponse(content=hist_user_list)
+
+
+@router.post('/api/update-visit')
+async def update_visit_user_post(data_update: UpdateUserRecordAdmin, user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    admin_list_full = admin_list_super + admin_list_normal
+    
+    if user not in admin_list_full:
+        return JSONResponse(content={'status': False}, status_code=403)
+    
+    date_r = datetime.strptime(data_update.date, '%d.%m.%Y')
+    time_r = datetime.strptime(data_update.time, '%H:%M')
+    date_full = datetime.combine(date_r, time_r.time()).isoformat()
+    update = data_update.update
+    
+    if update[0] == 'Комментарий':
+        await update_history_user_comment_admin(data_update.clientId, date_r, date_full, update[1])
+    
+    elif update[0] == 'Деньги':
+        await update_history_user_money(data_update.clientId, date_r, date_full, update[1])
+    
+    return JSONResponse(content={'status': True})
+
+
+@router.post('/api/usedby_admin')
+async def usedby_admin_post(user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    
+    if user in admin_list_super:
+        return JSONResponse(content={'status': 'superadmin'})
+    
+    elif user in admin_list_normal:
+        return JSONResponse(content={'status': 'admin'})
+    
+    else:
+        return JSONResponse(content='False')

@@ -9,7 +9,10 @@ from db.models.admin import (admin_add_windows_day, check_windows_day,
                              update_windows_day, admin_delete_windows_day,
                              schedule_record_user, admin_list, select_user_all,
                              black_list_user, select_user_all_blacklist_true,
-                             select_user_all_blacklist_false)
+                             select_user_all_blacklist_false, select_user_all_delete)
+from db.models.user import select_record_user, delete_record_user
+from db.models.main_windows import update_time_in_day, windows_day_time
+from collections import namedtuple
 
 import asyncio
 
@@ -37,6 +40,9 @@ class MailBot(BaseModel):
     
 class BlackList(BaseModel):
     clientId: int
+    
+class DeleteUserRecord(BaseModel):
+    appointmentId: str
 
 
 templates_admin = Jinja2Templates(directory=r"./templates/admin")
@@ -224,10 +230,15 @@ async def clients_all_post(request: Request, name: str, user: dict = Depends(get
         
         if name == 'sms':
             ul = await select_user_all()
+            
         elif name == 'blf':
             ul = await select_user_all_blacklist_true()
+            
         elif name == 'blt':
             ul = await select_user_all_blacklist_false()
+            
+        elif name == 'del':
+            ul = await select_user_all_delete()
         
         user_list = []
         for i in ul:
@@ -337,3 +348,79 @@ async def blacklist_true_user(request: Request, data: BlackList, user: dict = De
             return templates_auth.TemplateResponse("auth.html", {"request": request})
         
         return JSONResponse(content={'status': False}, status_code=401)
+    
+
+@router.post('/record_user/admin/{id_user}')
+async def record_user_id_post(request: Request, id_user: int, user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    admin_list_full = admin_list_super + admin_list_normal
+    
+    if user in admin_list_full:
+        
+        data_list = []
+        record_list = await select_record_user(id_user)
+        
+        for rl in record_list:
+            rec_dict = {
+                'id': rl[0],
+                'date': rl[1].strftime("%d.%m.%Y"),
+                'time': rl[2].split('T')[1][:-3],
+                'comment': rl[3]
+            }
+            data_list.append(rec_dict)
+
+        return JSONResponse(content=data_list)
+        
+    else:
+        if user:
+            pass
+        else:
+            return templates_auth.TemplateResponse("auth.html", {"request": request})
+        
+        return JSONResponse(content={'status': False}, status_code=401)
+    
+    
+@router.post('/delete_appointment_record_user')
+async def delete_appointment(request: Request, data: DeleteUserRecord, user: dict = Depends(get_current_user)):
+    
+    try:
+        if user:
+            pass
+        else:
+            return templates_auth.TemplateResponse("auth.html", {"request": request})
+        
+        await asyncio.sleep(2)
+        Data = namedtuple('Data', ['id', 'date', 'time'])
+        data = Data(*data.appointmentId.split('-'))
+
+        admin_list_super = [i[0] for i in await admin_list('superadmin')]
+        admin_list_normal = [i[0] for i in await admin_list('admin')]
+        admin_list_full = admin_list_super + admin_list_normal
+        
+        if user not in admin_list_full:
+            return JSONResponse(content={'status': False}, status_code=403)
+        
+        date_r = datetime.strptime(data.date, "%d.%m.%Y")
+        time_r = datetime.strptime(data.time, '%H:%M')
+        date_full = datetime.combine(date_r, time_r.time()).isoformat()
+        
+        if await delete_record_user(int(data.id), date_r, date_full):
+            
+            times = await windows_day_time(date_r)
+            
+            if times is None:
+                await admin_add_windows_day(date_r, [data.time])
+                
+            else:
+                times_list = times['time']
+                times_list.append(data.time)
+                
+                await update_time_in_day(date_r, sorted(times_list))
+            
+            return JSONResponse(content={'status': True})
+
+    except Exception as e:
+        print(f"Ошибка в обработке записи пользователя: {e}")
+        return JSONResponse(content={'status': False, 'error': str(e)}, status_code=500)

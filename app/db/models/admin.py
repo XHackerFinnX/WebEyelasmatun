@@ -253,3 +253,30 @@ async def black_list_user(id_user: int, status: bool):
             Admin._connection.close()
                 
         return
+    
+
+async def select_user_all_delete():
+    
+    query = """
+    SELECT p.id, p.name, p.telegram, p.telephone
+    FROM profile_user AS p
+    JOIN record_user AS r
+    ON p.id = r.id
+    WHERE r.status = true
+    AND p.blacklist = false
+    GROUP BY p.id
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query)
+                user_list = cursor.fetchall()
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка получения клиентов для удаления записи {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return user_list

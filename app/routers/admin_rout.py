@@ -29,6 +29,9 @@ class ScheduleDate(BaseModel):
 class SmsUser(BaseModel):
     clientId: int
     message: str
+    
+class MailBot(BaseModel):
+    message: str
 
 
 templates_admin = Jinja2Templates(directory=r"./templates/admin")
@@ -226,9 +229,28 @@ async def clients_all_post(user: dict = Depends(get_current_user)):
     else:
         return JSONResponse(content={'status': False}, status_code=401)
     
-
+    
+#Нужно сделать отправку через bot api
 @router.post('/api/send-message')
 async def send_message_user_post(data: SmsUser, user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    admin_list_full = admin_list_super + admin_list_normal
+    
+    if user in admin_list_full:
+        
+        print(data)
+        
+        return JSONResponse(content={'status': True})
+        
+    else:
+        return JSONResponse(content={'status': False}, status_code=401)
+    
+    
+#Нужно сделать отправку через bot api
+@router.post('/api/mailing-bot')
+async def mailing_bot_post(data: MailBot, user: dict = Depends(get_current_user)):
     
     admin_list_super = [i[0] for i in await admin_list('superadmin')]
     admin_list_normal = [i[0] for i in await admin_list('admin')]

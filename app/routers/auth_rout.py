@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
-from db.models.auth import user_check_authentication, update_authentication
+from db.models.auth import user_check_authentication, update_authentication, status_authentication
 
 from datetime import datetime
 
@@ -25,7 +25,15 @@ async def post_login(request: Request, data: LoginData):
     
     # Проверка аутентификации
     user = await user_check_authentication(data.username, data.password)
-
+    black_list_status = await status_authentication(data.username, data.password)
+    print(black_list_status)
+    if black_list_status[0] is None:
+        await update_authentication(data.username, False, datetime.now())
+        raise HTTPException(status_code=401, detail="Неверное имя пользователя или пароль")
+        
+    if black_list_status[0]:
+        raise HTTPException(status_code=401, detail="Вы заблокированы")
+    
     if user is None:
         dict_user = {}
         

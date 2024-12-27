@@ -280,3 +280,93 @@ async def select_user_all_delete():
             Admin._connection.close()
                 
         return user_list
+    
+
+async def select_user(id_user: int):
+    
+    query = """
+    SELECT last_site_visit, last_entry, quantity_visits, quantity_cancel, blacklist, ip_address
+    FROM profile_user
+    WHERE id = %s
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (id_user, ))
+                user_info = cursor.fetchall()
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка получения данных клиента {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return user_info
+    
+    
+async def select_history_user(id_user: int):
+    
+    query = """
+    SELECT date, time, comment_admin, money
+    FROM record_user
+    WHERE id = %s AND status = false
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (id_user, ))
+                user_history = cursor.fetchall()
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка получения данных истории клиента {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return user_history
+    
+
+async def update_history_user_comment_admin(id_user: int, date, time, comment: str):
+    
+    query = """
+    UPDATE record_user
+    SET comment_admin = %s
+    WHERE id = %s AND date = %s AND time = %s
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (comment, id_user, date, time))
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка обновления комментария админа {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return
+    
+    
+async def update_history_user_money(id_user: int, date, time, money: int):
+    
+    query = """
+    UPDATE record_user
+    SET money = %s
+    WHERE id = %s AND date = %s AND time = %s
+    """
+    
+    try:
+        with Admin._connect() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (money, id_user, date, time))
+            conn.commit()
+    except (InterfaceError, Error) as error:
+        print(f"Ошибка обновления денег {error}")
+    finally:
+        if Admin._connection:
+            Admin._connection.close()
+                
+        return

@@ -1,17 +1,31 @@
-// Sample client data
-const clients = [
-    { id: 1, name: "Иван Иванов", telegram: "@ivan", phone: "+7 (999) 123-45-67" },
-    { id: 222, name: "Мария Петрова", telegram: "@maria", phone: "+7 (999) 234-56-78" },
-    { id: 23, name: "Алексей Сидоров", telegram: "@alex", phone: "+7 (999) 345-67-89" },
-    { id: 224, name: "Елена Козлова", telegram: "@elena", phone: "+7 (999) 456-78-90" },
-];
-
 const clientList = document.getElementById('clientList');
 const searchInput = document.getElementById('searchInput');
 const modal = document.getElementById('modal');
 const clientIdSpan = document.getElementById('clientId');
 const messageInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('sendButton');
+const loadingIndicator = document.getElementById('loadingIndicator');
+
+let clients = [];
+
+// Fetch client data
+async function fetchClients() {
+    try {
+        const response = await fetch('/api/clients-all', {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        clients = await response.json();
+        populateClientList(clients);
+    } catch (error) {
+        console.error('Ошибка при выборке клиентов:', error);
+        clientList.innerHTML = '<p>Ошибка при загрузке клиентов. Пожалуйста, повторите попытку позже.</p>';
+    }
+}
 
 // Populate client list
 function populateClientList(clients) {
@@ -47,7 +61,6 @@ function openModal(clientId) {
 
 // Close modal
 window.onclick = function(event) {
-    const message = messageInput.value;
     if (event.target == modal) {
         modal.style.display = 'none';
         messageInput.value = '';
@@ -55,17 +68,35 @@ window.onclick = function(event) {
 }
 
 // Send message
-function sendMessage() {
+async function sendMessage() {
     const message = messageInput.value;
     const clientId = clientIdSpan.textContent.split(' ')[1];
-    console.log(`Сообщение для клиента ${clientId}: ${message}`);
-    messageInput.value = '';
-    modal.style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/send-message', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ clientId, message }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to send message');
+        }
+
+        console.log(`Сообщение для клиента ${clientId} отправлено: ${message}`);
+        messageInput.value = '';
+        modal.style.display = 'none';
+    } catch (error) {
+        console.error('Сообщение об ошибке при отправке сообщения:', error);
+        alert('Не удалось отправить сообщение. Пожалуйста, попробуйте снова.');
+    }
 }
 
 // Event listeners
 searchInput.addEventListener('input', filterClients);
 sendButton.addEventListener('click', sendMessage);
 
-// Initial population of client list
-populateClientList(clients);
+// Initial fetch of client data
+fetchClients();

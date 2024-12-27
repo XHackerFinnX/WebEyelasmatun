@@ -1,11 +1,3 @@
-// Sample client data
-const clients = [
-    { id: 1, name: "Иван Иванов", telegram: "@ivan", phone: "+7 (999) 123-45-67" },
-    { id: 222, name: "Мария Петрова", telegram: "@maria", phone: "+7 (999) 234-56-78" },
-    { id: 23, name: "Алексей Сидоров", telegram: "@alex", phone: "+7 (999) 345-67-89" },
-    { id: 224, name: "Елена Козлова", telegram: "@elena", phone: "+7 (999) 456-78-90" },
-];
-
 const clientList = document.getElementById('clientList');
 const searchInput = document.getElementById('searchInput');
 const modal = document.getElementById('modal');
@@ -31,6 +23,25 @@ function populateClientList(clients) {
     });
 }
 
+async function fetchClients() {
+    try {
+        const response = await fetch('/api/clients-all', {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        clients = await response.json();
+        populateClientList(clients);
+    } catch (error) {
+        console.error('Ошибка при выборке клиентов:', error);
+        clientList.innerHTML = '<p>Ошибка при загрузке клиентов. Пожалуйста, повторите попытку позже.</p>';
+    }
+}
+
+
 // Filter clients based on search input
 function filterClients() {
     const searchTerm = searchInput.value.toLowerCase();
@@ -52,10 +63,21 @@ function closeModal() {
 }
 
 // Add to blacklist
-function addToBlacklist() {
+async function addToBlacklist() {
     const clientId = clientIdSpan.textContent.split(' ')[1];
-    console.log(`Client ID ${clientId} not to blacklist`);
-    closeModal();
+
+    const response = await fetch('/api/blacklist-false', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ clientId }),
+    });
+
+    if (response.ok) {
+        console.log(`Client ID ${clientId} not to blacklist`);
+        closeModal();
+    }
 }
 
 // Event listeners
@@ -69,6 +91,4 @@ window.onclick = function(event) {
         closeModal();
     }
 }
-
-// Initial population of client list
-populateClientList(clients);
+fetchClients();

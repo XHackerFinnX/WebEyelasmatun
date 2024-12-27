@@ -32,6 +32,9 @@ class SmsUser(BaseModel):
     
 class MailBot(BaseModel):
     message: str
+    
+class BlackList(BaseModel):
+    clientId: int
 
 
 templates_admin = Jinja2Templates(directory=r"./templates/admin")
@@ -251,6 +254,40 @@ async def send_message_user_post(data: SmsUser, user: dict = Depends(get_current
 #Нужно сделать отправку через bot api
 @router.post('/api/mailing-bot')
 async def mailing_bot_post(data: MailBot, user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    admin_list_full = admin_list_super + admin_list_normal
+    
+    if user in admin_list_full:
+        
+        print(data)
+        
+        return JSONResponse(content={'status': True})
+        
+    else:
+        return JSONResponse(content={'status': False}, status_code=401)
+    
+
+@router.post('/api/blacklist-true')
+async def blacklist_true_user(data: BlackList, user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    admin_list_normal = [i[0] for i in await admin_list('admin')]
+    admin_list_full = admin_list_super + admin_list_normal
+    
+    if user in admin_list_full:
+        
+        print(data)
+        
+        return JSONResponse(content={'status': True})
+        
+    else:
+        return JSONResponse(content={'status': False}, status_code=401)
+    
+    
+@router.post('/api/blacklist-false')
+async def blacklist_true_user(data: BlackList, user: dict = Depends(get_current_user)):
     
     admin_list_super = [i[0] for i in await admin_list('superadmin')]
     admin_list_normal = [i[0] for i in await admin_list('admin')]

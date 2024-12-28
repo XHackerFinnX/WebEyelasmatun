@@ -9,7 +9,8 @@ from db.models.user import (update_name_user, update_telegram_user,
                             update_telephone_user, select_profile_user,
                             select_record_user, delete_record_user)
 from db.models.main_windows import windows_day_time, update_time_in_day
-from db.models.admin import admin_add_windows_day
+from db.models.admin import admin_add_windows_day, admin_list
+from services.bot_notice import send_message_delete_user
 
 import asyncio
 
@@ -130,6 +131,10 @@ async def delete_record_post(request: Request, data_delete: DeleteRecordUser, us
         await asyncio.sleep(2)
         Data = namedtuple('Data', ['id', 'date', 'time'])
         data = Data(*data_delete.appointmentId.split('-'))
+        
+        admin_list_super = [i[0] for i in await admin_list('superadmin')]
+        admin_list_normal = [i[0] for i in await admin_list('admin')]
+        admin_list_full = admin_list_super + admin_list_normal
 
         if user != int(data.id):
             return JSONResponse(content={'status': False}, status_code=403)
@@ -153,6 +158,9 @@ async def delete_record_post(request: Request, data_delete: DeleteRecordUser, us
                     times_list.append(data.time)
                     
                     await update_time_in_day(date_r, sorted(times_list))
+                
+                text = f"Клиентка отменила запись на {data.date} {data.time}\nКлиент id: {data.id}"
+                await send_message_delete_user(admin_list_full, text)
                 
                 return JSONResponse(content={'status': True})
         

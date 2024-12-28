@@ -12,10 +12,11 @@ from app.db.models.admin import (admin_add_windows_day, check_windows_day,
                              select_user_all_blacklist_false, select_user_all_delete,
                              select_user, select_history_user, update_history_user_comment_admin,
                              update_history_user_money, select_date_money)
-from app.db.models.user import select_record_user, delete_record_user
+from app.db.models.user import select_record_user, delete_record_user, technical_record_user
 from app.db.models.main_windows import update_time_in_day, windows_day_time
 from collections import namedtuple
 from app.services.bot_notice import send_message_mail, send_message_private, send_message_delete_admin
+from app.services.push_service import push_sms_technic
 
 import calendar, locale
 import asyncio
@@ -610,6 +611,15 @@ async def notifications_start(user: dict = Depends(get_current_user)):
     admin_list_super = [i[0] for i in await admin_list('superadmin')]
     
     if user in admin_list_super:
+        
+        list_user_record = await technical_record_user()
+        
+        for lur in list_user_record:
+            date_r = lur[1]
+            time_r = datetime.strptime(lur[2].split('T')[1][:-3], '%H:%M')
+            date_full = datetime.combine(date_r, time_r.time())
+            print(lur[0], date_full)
+            asyncio.create_task(push_sms_technic(lur[0], date_full))
 
         return JSONResponse(content={'status': True})
     

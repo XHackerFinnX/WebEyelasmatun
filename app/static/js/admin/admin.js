@@ -54,6 +54,9 @@ async function handleTileClick(event) {
         case 'earnings-chart':
             endpoint = `update/earnings-chart/${id_user}`;
             break;
+        case 'technical':
+            endpoint = `update/technical/${id_user}`;
+            break;
         default:
             console.error('Unknown tile clicked');
             return;

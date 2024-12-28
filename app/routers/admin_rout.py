@@ -168,6 +168,9 @@ async def admin_get(request: Request, name: str, admin: int, user: dict = Depend
                     
                 elif name == 'earnings-chart':
                     name_html = 'earnings-chart.html'
+                    
+                elif name == 'technical':
+                    name_html = 'technical.html'
                 
                 return templates_admin.TemplateResponse(name_html, {"request": request, "user": userP})
             else:

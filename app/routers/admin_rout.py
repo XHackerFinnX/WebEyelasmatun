@@ -603,3 +603,15 @@ async def earnings_post(data: DateRange, user: dict = Depends(get_current_user))
     else:
         return JSONResponse(content={'status': False})
     
+
+@router.post('/api/notifications/start')
+async def notifications_start(user: dict = Depends(get_current_user)):
+    
+    admin_list_super = [i[0] for i in await admin_list('superadmin')]
+    
+    if user in admin_list_super:
+
+        return JSONResponse(content={'status': True})
+    
+    else:
+        return JSONResponse(content={'status': False}, status_code=401)

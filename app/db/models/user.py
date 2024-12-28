@@ -196,3 +196,21 @@ async def profile_record_user(id_user: int):
     except Exception as error:
         print(f"Ошибка получения профиля клиента: {error}")
         return None
+    
+
+async def technical_record_user():
+    
+    query = """
+    SELECT id, date, time
+    FROM record_user
+    WHERE status = true
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            users = await conn.fetch(query)
+            return users
+    except Exception as error:
+        print(f"Ошибка получения записей клиента: {error}")
+        return None

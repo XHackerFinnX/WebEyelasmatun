@@ -8,6 +8,7 @@ from app.routers.auth_rout import router as router_auth
 from app.routers.main_rout import router as router_main
 from app.routers.admin_rout import router as router_admin
 from app.routers.user_rout import router as router_user
+from app.routers.feedback_rout import router as router_feedback
 
 
 app = FastAPI(
@@ -39,3 +40,4 @@ app.include_router(router_auth)
 app.include_router(router_main)
 app.include_router(router_admin)
 app.include_router(router_user)
+app.include_router(router_feedback)

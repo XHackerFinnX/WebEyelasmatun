@@ -252,3 +252,89 @@ async def update_profile_last_record_user(id_user: int, date):
     except Exception as error:
         print(f"Ошибка обновления последней записи: {error}")
         return False
+    
+    
+async def check_record_user_before_notification(id_user: int, date, time):
+    
+    query = """
+    SELECT status 
+    FROM record_user
+    WHERE id = $1 AND date = $2 AND time = $3
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            record_user = await conn.fetch(query, id_user, date, time)
+            return record_user
+    except Exception as error:
+        print(f"Ошибка обновления статуса: {error}")
+        return False
+    
+    
+async def count_add_visits(id_user: int):
+    
+    query = """
+    SELECT quantity_visits
+    FROM profile_user
+    WHERE id = $1
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            count_visits = await conn.fetch(query, id_user)
+    except Exception as error:
+        print(f"Ошибка получения количества посещений: {error}")
+        count_visits = 0
+    
+    cv = count_visits[0]['quantity_visits'] + 1
+    
+    query = """
+    UPDATE profile_user
+    SET quantity_visits = $1
+    WHERE id = $2
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            await conn.execute(query, cv, id_user)
+            return True
+    except Exception as error:
+        print(f"Ошибка обновления количества посещений: {error}")
+        return False
+    
+
+async def count_del_visits(id_user: int):
+    
+    query = """
+    SELECT quantity_cancel
+    FROM profile_user
+    WHERE id = $1
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            count_del = await conn.fetch(query, id_user)
+    except Exception as error:
+        print(f"Ошибка получения количества отмен: {error}")
+        count_del = 0
+    
+    cd = count_del[0]['quantity_cancel'] + 1
+    
+    query = """
+    UPDATE profile_user
+    SET quantity_cancel = $1
+    WHERE id = $2
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            await conn.execute(query, cd, id_user)
+            return True
+    except Exception as error:
+        print(f"Ошибка обновления количества отмен: {error}")
+        return False

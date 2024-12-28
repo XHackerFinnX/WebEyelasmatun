@@ -11,6 +11,7 @@ from app.db.models.main_windows import (windows_day, windows_day_time,
 from app.db.models.user import update_last_visit_user, add_record_user, check_record_time
 from app.db.models.admin import select_day_time, update_windows_day, admin_delete_windows_day, admin_list
 from app.utils.ip_address import get_ip
+from app.services.push_service import push_sms
 
 import asyncio
 
@@ -126,6 +127,8 @@ async def record_post(request: Request, data_record: RecordUser, user: dict = De
                         
                 if not time_list:
                     await admin_delete_windows_day(date_r)
+                    
+                asyncio.create_task(push_sms(user, date_full))
                 
                 return JSONResponse(content={"success": True})
             else:

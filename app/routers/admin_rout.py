@@ -15,6 +15,7 @@ from db.models.admin import (admin_add_windows_day, check_windows_day,
 from db.models.user import select_record_user, delete_record_user
 from db.models.main_windows import update_time_in_day, windows_day_time
 from collections import namedtuple
+from services.bot_notice import send_message_mail, send_message_private, send_message_delete_admin
 
 import calendar, locale
 import asyncio
@@ -291,7 +292,7 @@ async def send_message_user_post(request: Request, data: SmsUser, user: dict = D
     
     if user in admin_list_full:
         
-        print(data)
+        await send_message_private(data.clientId, user, data.message)
         
         return JSONResponse(content={'status': True})
         
@@ -303,8 +304,7 @@ async def send_message_user_post(request: Request, data: SmsUser, user: dict = D
         
         return JSONResponse(content={'status': False}, status_code=401)
     
-    
-#Нужно сделать отправку через bot api
+
 @router.post('/api/mailing-bot')
 async def mailing_bot_post(request: Request, data: MailBot, user: dict = Depends(get_current_user)):
     
@@ -314,7 +314,9 @@ async def mailing_bot_post(request: Request, data: MailBot, user: dict = Depends
     
     if user in admin_list_full:
         
-        print(data)
+        id_user_all = await select_user_all()
+        
+        asyncio.create_task(send_message_mail(id_user_all, admin_list_full, data.message))
         
         return JSONResponse(content={'status': True})
         
@@ -437,6 +439,9 @@ async def delete_appointment(request: Request, data: DeleteUserRecord, user: dic
                 times_list.append(data.time)
                 
                 await update_time_in_day(date_r, sorted(times_list))
+            
+            text_sms = 'Администратор удалил вашу запись к Eyelasmatun! Если у вас вопросы обратитесь к менеджеру @matun_manager'
+            await send_message_delete_admin(int(data.id), text_sms)
             
             return JSONResponse(content={'status': True})
 

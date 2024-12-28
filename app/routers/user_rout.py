@@ -160,7 +160,8 @@ async def delete_record_post(request: Request, data_delete: DeleteRecordUser, us
                     await update_time_in_day(date_r, sorted(times_list))
                 
                 text = f"Клиентка отменила запись на {data.date} {data.time}\nКлиент id: {data.id}"
-                await send_message_delete_user(admin_list_full, text)
+                admin_group = -1002034439978
+                await send_message_delete_user(admin_group, text)
                 
                 return JSONResponse(content={'status': True})
         

@@ -104,6 +104,15 @@ async def record_post(request: Request, data_record: RecordUser, user: dict = De
         
         await asyncio.sleep(3)
         
+        date_today = datetime.now()
+        date_minus_hours_3 = date_full - timedelta(hours=3)
+
+        if date_today > date_full:
+            return JSONResponse(content={"success": False})
+        
+        if date_today > date_minus_hours_3:
+            return JSONResponse(content={"success": False})
+        
         try:
             if await check_record_time(user, date_r, date_full) is None:
                 await add_record_user(user, date_r, date_full, comment_r, True)

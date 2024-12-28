@@ -160,3 +160,39 @@ async def delete_record_user(id_user: int, date, time):
     except Exception as error:
         print(f"Ошибка удаления записи клиента: {error}")
         return False
+    
+    
+async def update_status_record_user(id_user: int, date, time):
+    
+    query = """
+    UPDATE record_user
+    SET status = false
+    WHERE id = $1 AND date = $2 AND time = $3
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            await conn.execute(query, id_user, date, time)
+            return True
+    except Exception as error:
+        print(f"Ошибка обновления статуса: {error}")
+        return False
+    
+
+async def profile_record_user(id_user: int):
+    
+    query = """
+    SELECT id, name, telegram
+    FROM profile_user
+    WHERE id = $1
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            users = await conn.fetch(query, id_user)
+            return users
+    except Exception as error:
+        print(f"Ошибка получения профиля клиента: {error}")
+        return None

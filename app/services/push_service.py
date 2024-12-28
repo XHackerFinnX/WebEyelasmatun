@@ -40,4 +40,41 @@ async def push_sms(id_user, date):
         await update_status_record_user(id_user, date_r, time_r)
         
     return
+
+
+async def push_sms_technic(id_user, date):
+    
+    text = f"Напоминаю {date.strftime('%d.%m.%Y %H:%M')}\nЗапись к Eyelasmatun"
+    
+    date_r = date.date()
+    time_r = date.isoformat()
+    date_today = datetime.now()
+    if date_today.date() == date.date():
+        counting_down = date - date_today - timedelta(hours=1)
+        if counting_down.seconds < 0:
+            await send_message_record(id_user, text)
+            await update_status_record_user(id_user, date_r, time_r)
+        else:
+            await asyncio.sleep(counting_down.seconds)
+            await send_message_record(id_user, text)
+            await update_status_record_user(id_user, date_r, time_r)
+        
+    elif date_today.date() == date.date() - timedelta(days=1):
+        counting_down = date - date_today - timedelta(hours=1)
+        await asyncio.sleep(counting_down.seconds)
+        await send_message_record(id_user, text)
+        await update_status_record_user(id_user, date_r, time_r)
+        
+    elif date_today.date() < date.date():
+        counting_down = date - date_today - timedelta(days=1)
+        await asyncio.sleep(counting_down.seconds)
+        await send_message_record(id_user, text)
+        
+        date_today = datetime.now()
+        counting_down = date - date_today - timedelta(hours=1)
+        await asyncio.sleep(counting_down.seconds)
+        await send_message_record(id_user, text)
+        await update_status_record_user(id_user, date_r, time_r)
+        
+    return
         

@@ -7,7 +7,7 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 from app.db.models.user import (update_name_user, update_telegram_user,
                             update_telephone_user, select_profile_user,
-                            select_record_user, delete_record_user)
+                            select_record_user, delete_record_user, count_del_visits)
 from app.db.models.main_windows import windows_day_time, update_time_in_day
 from app.db.models.admin import admin_add_windows_day, admin_list
 from app.services.bot_notice import send_message_delete_user
@@ -162,6 +162,8 @@ async def delete_record_post(request: Request, data_delete: DeleteRecordUser, us
                 text = f"Клиентка отменила запись на {data.date} {data.time}\nКлиент id: {data.id}"
                 admin_group = -1002034439978
                 await send_message_delete_user(admin_group, text)
+                
+                await count_del_visits(int(data.id))
                 
                 return JSONResponse(content={'status': True})
         

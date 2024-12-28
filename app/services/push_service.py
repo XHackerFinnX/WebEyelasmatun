@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from app.services.bot_notice import send_message_record, send_message_record_admin
-from app.db.models.user import update_status_record_user, profile_record_user
+from app.db.models.user import (update_status_record_user, profile_record_user,
+                                last_record_user, update_profile_last_record_user)
 import asyncio
 
 async def push_sms(id_user, date):
@@ -21,12 +22,16 @@ async def push_sms(id_user, date):
         await asyncio.sleep(counting_down.seconds)
         await send_message_record(id_user, text)
         await update_status_record_user(id_user, date_r, time_r)
+        last_r_user = await last_record_user(id_user)
+        await update_profile_last_record_user(id_user, last_r_user[0]['date'])
         
     elif date_today.date() == date.date() - timedelta(days=1):
         counting_down = date - date_today - timedelta(hours=1)
         await asyncio.sleep(counting_down.seconds)
         await send_message_record(id_user, text)
         await update_status_record_user(id_user, date_r, time_r)
+        last_r_user = await last_record_user(id_user)
+        await update_profile_last_record_user(id_user, last_r_user[0]['date'])
         
     elif date_today.date() < date.date():
         counting_down = date - date_today - timedelta(days=1)
@@ -38,6 +43,8 @@ async def push_sms(id_user, date):
         await asyncio.sleep(counting_down.seconds)
         await send_message_record(id_user, text)
         await update_status_record_user(id_user, date_r, time_r)
+        last_r_user = await last_record_user(id_user)
+        await update_profile_last_record_user(id_user, last_r_user[0]['date'])
         
     return
 

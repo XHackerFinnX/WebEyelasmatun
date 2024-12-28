@@ -214,3 +214,41 @@ async def technical_record_user():
     except Exception as error:
         print(f"Ошибка получения записей клиента: {error}")
         return None
+    
+    
+async def last_record_user(id_user: int):
+    
+    query = """
+    SELECT date
+    FROM record_user
+    WHERE id = $1 AND status = false
+    ORDER BY date DESC
+    LIMIT 1
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            last_r_user = await conn.fetch(query, id_user)
+            return last_r_user
+    except Exception as error:
+        print(f"Ошибка получения последней записи клиента: {error}")
+        return None
+    
+    
+async def update_profile_last_record_user(id_user: int, date):
+    
+    query = """
+    UPDATE profile_user
+    SET last_entry = $1
+    WHERE id = $2
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            await conn.execute(query, date, id_user)
+            return True
+    except Exception as error:
+        print(f"Ошибка обновления последней записи: {error}")
+        return False

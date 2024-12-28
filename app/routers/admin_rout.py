@@ -12,7 +12,7 @@ from app.db.models.admin import (admin_add_windows_day, check_windows_day,
                              select_user_all_blacklist_false, select_user_all_delete,
                              select_user, select_history_user, update_history_user_comment_admin,
                              update_history_user_money, select_date_money)
-from app.db.models.user import select_record_user, delete_record_user, technical_record_user
+from app.db.models.user import select_record_user, delete_record_user, technical_record_user, count_del_visits
 from app.db.models.main_windows import update_time_in_day, windows_day_time
 from collections import namedtuple
 from app.services.bot_notice import send_message_mail, send_message_private, send_message_delete_admin
@@ -446,6 +446,8 @@ async def delete_appointment(request: Request, data: DeleteUserRecord, user: dic
             
             text_sms = 'Администратор удалил вашу запись к Eyelasmatun! Если у вас вопросы обратитесь к менеджеру @matun_manager'
             await send_message_delete_admin(int(data.id), text_sms)
+            
+            await count_del_visits(int(data.id))
             
             return JSONResponse(content={'status': True})
 

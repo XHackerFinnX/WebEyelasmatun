@@ -2,12 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
-from config.config import config
+from app.config.config import config
 
-from routers.auth_rout import router as router_auth
-from routers.main_rout import router as router_main
-from routers.admin_rout import router as router_admin
-from routers.user_rout import router as router_user
+from app.routers.auth_rout import router as router_auth
+from app.routers.main_rout import router as router_main
+from app.routers.admin_rout import router as router_admin
+from app.routers.user_rout import router as router_user
 
 
 app = FastAPI(
@@ -23,8 +23,8 @@ app.add_middleware(
 )
 
 app.mount(
-    r"/static",
-    StaticFiles(directory='static'),
+    r"/app/static",
+    StaticFiles(directory='app/static'),
     name="static"
 )
 

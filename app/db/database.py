@@ -1,5 +1,5 @@
 import psycopg2
-from config.config import config
+from app.config.config import config
 import asyncpg
 
 

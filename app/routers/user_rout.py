@@ -2,15 +2,15 @@ from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
-from routers.auth_rout import get_current_user
+from app.routers.auth_rout import get_current_user
 from collections import namedtuple
 from datetime import datetime, timedelta
-from db.models.user import (update_name_user, update_telegram_user,
+from app.db.models.user import (update_name_user, update_telegram_user,
                             update_telephone_user, select_profile_user,
                             select_record_user, delete_record_user)
-from db.models.main_windows import windows_day_time, update_time_in_day
-from db.models.admin import admin_add_windows_day, admin_list
-from services.bot_notice import send_message_delete_user
+from app.db.models.main_windows import windows_day_time, update_time_in_day
+from app.db.models.admin import admin_add_windows_day, admin_list
+from app.services.bot_notice import send_message_delete_user
 
 import asyncio
 
@@ -31,9 +31,9 @@ class DeleteRecordUser(BaseModel):
     appointmentId: str
 
 
-templates_user = Jinja2Templates(directory=r"./templates/user")
-templates_main = Jinja2Templates(directory=r"./templates/main")
-templates_auth = Jinja2Templates(directory=r"./templates/auth")
+templates_user = Jinja2Templates(directory=r"./app/templates/user")
+templates_main = Jinja2Templates(directory=r"./app/templates/main")
+templates_auth = Jinja2Templates(directory=r"./app/templates/auth")
 
 
 @router.get('/profile/users/{users}')

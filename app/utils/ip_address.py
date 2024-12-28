@@ -1,4 +1,4 @@
-from db.models.user import update_ip_user
+from app.db.models.user import update_ip_user
 import httpx
 
 async def get_ip(data, login):

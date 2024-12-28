@@ -1,5 +1,5 @@
 from psycopg2 import Error, InterfaceError
-from db.database import Admin
+from app.db.database import Admin
 
 
 Admin = Admin()

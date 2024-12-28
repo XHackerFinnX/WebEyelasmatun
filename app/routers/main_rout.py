@@ -2,18 +2,17 @@ from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from pydantic import BaseModel
-from routers.auth_rout import get_current_user
+from app.routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
-from db.models.main_windows import (windows_day, windows_day_time, 
+from app.db.models.main_windows import (windows_day, windows_day_time, 
                                     price_list_load, price_list_add, 
                                     price_list_check, price_list_update, price_list_delete,
                                     price_list_select_user)
-from db.models.user import update_last_visit_user, add_record_user, check_record_time
-from db.models.admin import select_day_time, update_windows_day, admin_delete_windows_day, admin_list
-from utils.ip_address import get_ip
+from app.db.models.user import update_last_visit_user, add_record_user, check_record_time
+from app.db.models.admin import select_day_time, update_windows_day, admin_delete_windows_day, admin_list
+from app.utils.ip_address import get_ip
 
 import asyncio
-import random
 
 router = APIRouter(
     prefix="",
@@ -36,13 +35,13 @@ class PriceItem(BaseModel):
     name: str
     price: int
 
-templates_main = Jinja2Templates(directory=r"./templates/main")
-templates_auth = Jinja2Templates(directory=r"./templates/auth")
+templates_main = Jinja2Templates(directory=r"./app/templates/main")
+templates_auth = Jinja2Templates(directory=r"./app/templates/auth")
 
 @router.get("/favicon.ico")
 async def favicon():
 
-    return FileResponse("/static/images/favicon.ico")
+    return FileResponse("app/static/images/favicon.ico")
 
 @router.get('/')
 async def main_get(request: Request, user: dict = Depends(get_current_user)):

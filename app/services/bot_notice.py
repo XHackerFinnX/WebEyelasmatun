@@ -1,4 +1,4 @@
-from config.config import config
+from app.config.config import config
 
 import requests
 import asyncio
@@ -75,4 +75,22 @@ async def send_message_delete_user(admin_id_list: list, text: str):
         await asyncio.sleep(0.5)
     
     return
+
+
+async def send_message_record(chat_id: int, admin_id_list: list, text: str):
     
+    try:
+        message = f'{API_URL}{config.BOT_TOKEN.get_secret_value()}/sendMessage?chat_id={chat_id}&text={text}'
+        requests.get(message)
+    except:
+        pass
+    
+    
+async def send_message_record_admin(chat_id: int, admin_id_list: list, text: str):
+    
+    for admin_id in admin_id_list:
+        try:
+            message = f'{API_URL}{config.BOT_TOKEN.get_secret_value()}/sendMessage?chat_id={admin_id}&text={text}'
+            requests.get(message)
+        except:
+            pass

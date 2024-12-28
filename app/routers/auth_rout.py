@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
-from db.models.auth import (user_check_authentication, update_authentication,
+from app.db.models.auth import (user_check_authentication, update_authentication,
                             status_authentication, synchronic_status_authentication)
 from datetime import datetime
 
@@ -13,7 +13,7 @@ router = APIRouter(
     tags=["Auth"]
 )
 
-templates = Jinja2Templates(directory=r"./templates/auth")
+templates = Jinja2Templates(directory=r"./app/templates/auth")
 
 
 class LoginData(BaseModel):

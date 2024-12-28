@@ -1,4 +1,4 @@
-from db.database import User
+from app.db.database import User
 
 
 User = User()

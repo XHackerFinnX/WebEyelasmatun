@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eyelasmatun - Отзывы</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="/app/static/css/main/feedback.css">
+    <link rel="icon" href="/app/static/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="menu-icon" id="menuIcon">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="/" class="dropdown-item"><i class="fas fa-calendar-plus"></i> Записаться</a>
+                {% if admin_or_user == 'admin'%}
+                <a href="/profile/{{user}}" class="dropdown-item"><i class="fas fa-user-cog"></i> Админ панель</a>
+                {% else %}
+                <a href="/profile/{{user}}" class="dropdown-item"><i class="fas fa-user"></i> Мой профиль</a>
+                {% endif %}
+                <a href="/pricelist/{{user}}" class="dropdown-item"><i class="fas fa-tags"></i> Прайс-лист</a>
+                <a href="/feedback/{{user}}" class="dropdown-item"><i class="fas fa-star"></i> Отзывы</a>
+                <a href="#" class="dropdown-item"><i class="fas fa-envelope"></i> Контакты</a>
+                <a href="#" id="logoutButton" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Выйти</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="feedback-container">
+        <h1>Отзывы</h1>
+        <form id="feedback-form">
+            <div class="feedback-input-container">
+                <textarea id="feedback-text" placeholder="Оставьте свой отзыв"></textarea>
+                <div class="feedback-header">
+                    <div class="rating">
+                        <span class="star" data-rating="1">&#9733;</span>
+                        <span class="star" data-rating="2">&#9733;</span>
+                        <span class="star" data-rating="3">&#9733;</span>
+                        <span class="star" data-rating="4">&#9733;</span>
+                        <span class="star" data-rating="5">&#9733;</span>
+                    </div>
+                    <button type="submit">Добавить отзыв</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="filter-dropdown">
+            <button class="filter-dropdown-btn">Фильтры <i class="fas fa-chevron-down"></i></button>
+            <div class="filter-dropdown-content">
+                <button class="filter-btn" data-filter="new">Сначала новые</button>
+                <button class="filter-btn" data-filter="old">Сначала старые</button>
+                <button class="filter-btn" data-filter="high">Высокие оценки</button>
+                <button class="filter-btn" data-filter="low">Низкие оценки</button>
+                <button class="filter-btn" data-filter="my">Мои отзывы</button>
+            </div>
+        </div>
+
+        <div id="feedback-list"></div>
+        <button id="load-more" class="load-more-btn">Ещё</button>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ru.js"></script>
+    <script src="/app/static/js/main/feedback.js"></script>
+</body>
+</html>
+

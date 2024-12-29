@@ -338,3 +338,22 @@ async def count_del_visits(id_user: int):
     except Exception as error:
         print(f"Ошибка обновления количества отмен: {error}")
         return False
+    
+    
+async def get_photo_from_db(user_id: int):
+
+    query = """
+    SELECT name, data 
+    FROM photo_user
+    WHERE id = $1
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            result = await conn.fetchrow(query, user_id)
+            if result:
+                return result["name"], result["data"]
+            return None, None
+    except Exception as error:
+        print(f"Ошибка получения фотографии: {error}")

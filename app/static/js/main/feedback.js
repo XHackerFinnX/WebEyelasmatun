@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentRating = 0;
     let currentFilter = 'new';
     let currentPage = 1;
+    let userId = 0;
 
     stars.forEach(star => {
         star.addEventListener('click', () => {
@@ -90,11 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    feedbackForm.addEventListener('submit', (e) => {
+    feedbackForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const feedbackText = document.getElementById('feedback-text').value;
         if (feedbackText && currentRating > 0) {
-            submitFeedback(feedbackText, currentRating);
+            await submitFeedback(feedbackText, currentRating);
             feedbackForm.reset();
             currentRating = 0;
             updateStars();
@@ -137,44 +138,79 @@ document.addEventListener('DOMContentLoaded', () => {
         filterDropdownContent.style.display = filterDropdownContent.style.display === 'block' ? 'none' : 'block';
     });
 
-    function submitFeedback(text, rating) {
-        console.log('Отзыв отправлен:', { text, rating });
-        loadFeedback();
-        alert('Спасибо за ваш отзыв :)');
+    async function submitFeedback(text, rating) {
+        try {
+            const response = await fetch('/api/feedback/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text, rating }),
+            });
+
+            if (response.ok) {
+                console.log('Отзыв отправлен:', { text, rating });
+                alert('Спасибо за ваш отзыв :)');
+                loadFeedback();
+            } else {
+                alert('Вы уже оставляли отзыв. Вы сможете оставить ещё один отзыв, если придете на запись к Eyelasmatun');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ошибка при отправке отзыва. Попробуйте позже.');
+        }
     }
 
-    function loadFeedback(append = false) {
-        let sortedFeedback = [...fakeFeedback];
+    async function loadFeedback(append = false) {
+        try {
+            const response = await fetch('/api/feedback/load', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ filteruser: currentFilter, page: currentPage }),
+            });
+
+            if (response.ok) {
+                const feedbackData = await response.json();
+                
+                const { feedback, hasMore, userId: fetchedUserId } = feedbackData;
+                userId = fetchedUserId;
+                if (!append) {
+                    feedbackList.innerHTML = '';
+                }
+
+                const sortedFeedback = sortFeedback(feedback);
+
+                sortedFeedback.forEach(item => {
+                    const feedbackItem = createFeedbackItem(item);
+                    feedbackList.appendChild(feedbackItem);
+                });
+
+                if (!hasMore) {
+                    loadMoreBtn.style.display = 'none';
+                } else {
+                    loadMoreBtn.style.display = 'block';
+                }
+            } else {
+                console.error('Failed to load feedback');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function sortFeedback(feedback) {
         if (currentFilter === 'new') {
-            sortedFeedback.sort((a, b) => new Date(b.date) - new Date(a.date));
+            return feedback.sort((a, b) => new Date(b.date) - new Date(a.date));
         } else if (currentFilter === 'old') {
-            sortedFeedback.sort((a, b) => new Date(a.date) - new Date(b.date));
+            return feedback.sort((a, b) => new Date(a.date) - new Date(b.date));
         } else if (currentFilter === 'high') {
-            sortedFeedback.sort((a, b) => b.rating - a.rating);
+            return feedback.sort((a, b) => b.rating - a.rating);
         } else if (currentFilter === 'low') {
-            sortedFeedback.sort((a, b) => a.rating - b.rating);
+            return feedback.sort((a, b) => a.rating - b.rating);
         } else if (currentFilter === 'my') {
-            const userId = 2;
-            sortedFeedback = sortedFeedback.filter(feedback => feedback.id === userId);
-        }
-
-        const startIndex = (currentPage - 1) * 10;
-        const endIndex = currentPage * 10;
-        const currentPageFeedback = sortedFeedback.slice(startIndex, endIndex);
-
-        if (!append) {
-            feedbackList.innerHTML = '';
-        }
-
-        currentPageFeedback.forEach(feedback => {
-            const feedbackItem = createFeedbackItem(feedback);
-            feedbackList.appendChild(feedbackItem);
-        });
-
-        if (endIndex >= sortedFeedback.length) {
-            loadMoreBtn.style.display = 'none';
-        } else {
-            loadMoreBtn.style.display = 'block';
+            return feedback.filter(item => item.id === userId);
         }
     }
 
@@ -205,30 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return stars;
     }
-
-    const fakeFeedback = [
-        { id: 1, name: 'Анна', avatar: '/app/static/images/feedback.png', text: 'Отличный сервис!', rating: 5, date: '2024-12-01' },
-        { id: 2, name: 'Иван', avatar: '/app/static/images/feedback.png', text: 'Хорошо, но можно лучше.', rating: 4, date: '2024-11-30' },
-        { id: 3, name: 'Мария', avatar: '/app/static/images/feedback.png', text: 'Не понравилось обслуживание.', rating: 2, date: '2024-11-29' },
-        { id: 4, name: 'Петр', avatar: '/app/static/images/feedback.png', text: 'Все отлично!', rating: 5, date: '2024-11-28' },
-        { id: 5, name: 'Ольга', avatar: '/app/static/images/feedback.png', text: 'Нормально.', rating: 3, date: '2024-11-27' },
-        { id: 6, name: 'Сергей', avatar: '/app/static/images/feedback.png', text: 'Ужасно!', rating: 1, date: '2024-11-26' },
-        { id: 7, name: 'Елена', avatar: '/app/static/images/feedback.png', text: 'Рекомендую!', rating: 5, date: '2024-11-25' },
-        { id: 8, name: 'Дмитрий', avatar: '/app/static/images/feedback.png', text: 'Неплохо.', rating: 4, date: '2024-11-24' },
-        { id: 9, name: 'Светлана', avatar: '/app/static/images/feedback.png', text: 'Быстро и удобно.', rating: 5, date: '2024-11-23' },
-        { id: 10, name: 'Андрей', avatar: '/app/static/images/feedback.png', text: 'Все понравилось!', rating: 5, date: '2024-11-22' },
-        { id: 11, name: 'Татьяна', avatar: '/app/static/images/feedback.png', text: 'Отличный сервис!', rating: 5, date: '2024-11-21' },
-        { id: 12, name: 'Алексей', avatar: '/app/static/images/feedback.png', text: 'Хорошо, но можно лучше.', rating: 4, date: '2024-11-20' },
-        { id: 13, name: 'Наталья', avatar: '/app/static/images/feedback.png', text: 'Не понравилось обслуживание. Не апварпп ы понравилось обслуживание. Не понравилось обслуживание. Не понравилось обслуживание.', rating: 2, date: '2024-11-19' },
-        { id: 14, name: 'Владимир', avatar: '/app/static/images/feedback.png', text: 'Все отлично!', rating: 5, date: '2024-11-18' },
-        { id: 15, name: 'Юлия', avatar: '/app/static/images/feedback.png', text: 'Нормально.', rating: 3, date: '2024-11-17' },
-        { id: 16, name: 'Михаил', avatar: '/app/static/images/feedback.png', text: 'Ужасно!', rating: 1, date: '2024-11-16' },
-        { id: 17, name: 'Ирина', avatar: '/app/static/images/feedback.png', text: 'Рекомендую!', rating: 5, date: '2024-11-15' },
-        { id: 18, name: 'Евгений', avatar: '/app/static/images/feedback.png', text: 'Неплохо.', rating: 4, date: '2024-11-14' },
-        { id: 19, name: 'Анастасия', avatar: '/app/static/images/feedback.png', text: 'Быстро и удобно.', rating: 5, date: '2024-11-12' },
-        { id: 20, name: 'Денис', avatar: '/app/static/images/feedback.png', text: 'Все понравилось!', rating: 5, date: '2024-11-13' },
-        { id: 21, name: 'Денис', avatar: '/app/static/images/feedback.png', text: 'Все понравилось!', rating: 5, date: '2024-11-13' }
-    ];
 
     loadFeedback();
 });

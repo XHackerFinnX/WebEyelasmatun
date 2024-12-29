@@ -357,3 +357,95 @@ async def get_photo_from_db(user_id: int):
             return None, None
     except Exception as error:
         print(f"Ошибка получения фотографии: {error}")
+        
+        
+async def add_feedback_user(id_user: int, text_feedback: str, stars: int, date_feedback):
+    
+    query = """
+    SELECT count_feedback
+    FROM feedback_user
+    WHERE id = $1
+    ORDER BY count_feedback DESC
+    LIMIT 1
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            result = await conn.fetchrow(query, id_user)
+    except Exception as error:
+        print(f"Ошибка получения количества отзывов: {error}")
+        
+    count_feedback = 1
+    if result:
+        count_feedback = result["count_feedback"] + 1
+
+    query = """
+    SELECT quantity_visits, name
+    FROM profile_user
+    WHERE id = $1
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            result = await conn.fetchrow(query, id_user)
+    except Exception as error:
+        print(f"Ошибка получения количества записей завершенных: {error}")
+        
+    count_visits = result["quantity_visits"]
+    name_user = result["name"]
+ 
+    if count_visits < count_feedback:
+        return {'status': 'No feedback'}
+    
+    else:
+        query = """
+        INSERT INTO feedback_user (id, name, text_feedback, stars, count_feedback, date_feedback)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        """
+        
+        try:
+            pool = await User.connect()
+            async with pool.acquire() as conn:
+                await conn.execute(query, id_user, name_user, text_feedback, stars, count_feedback, date_feedback)
+                return {'status': 'feedback'}
+        except Exception as error:
+            print(f"Ошибка добавления отзыва: {error}")
+            
+            
+async def all_feedback_user():
+    
+    query = """
+    SELECT id, name, text_feedback, stars, date_feedback
+    FROM feedback_user
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            all_feedback = await conn.fetch(query)
+            return all_feedback
+    except Exception as error:
+        print(f"Ошибка получения отзывов клиентов: {error}")
+        return []
+    
+    
+async def select_user_photo():
+
+    query = """
+    SELECT id
+    FROM photo_user
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            check_id = await conn.fetch(query)
+            if check_id:
+                return check_id
+            else:
+                return []
+    except Exception as error:
+        print(f"Ошибка получения id фотографий клиентов: {error}")
+        return []

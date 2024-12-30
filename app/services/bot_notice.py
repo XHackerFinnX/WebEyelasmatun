@@ -1,4 +1,5 @@
 from app.config.config import config
+from app.db.models.user import notification_user_true
 
 import requests
 import asyncio
@@ -88,4 +89,20 @@ async def send_message_record_admin(admin_id: int, text: str):
     message = f'{API_URL}{config.BOT_TOKEN.get_secret_value()}/sendMessage?chat_id={admin_id}&text={text}'
     requests.get(message)
 
+    return
+
+
+async def send_message_mail_notification_price(chat_id_list: list):
+    
+    text = "Изменение цены в прайс-листе"
+    
+    for chat_id in chat_id_list:
+        try:
+            message = f'{API_URL}{config.BOT_TOKEN.get_secret_value()}/sendMessage?chat_id={chat_id[0]}&text={text}'
+            requests.get(message)
+        except:
+            pass
+        await notification_user_true(chat_id[0])
+        await asyncio.sleep(0.5)
+        
     return

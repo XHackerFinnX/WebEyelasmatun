@@ -190,6 +190,7 @@ async def get_photo(user_id: int):
 async def post_check_pulse(user: dict = Depends(get_current_user)):
     
     user_check = await notification_feedback_user(user)
+
     status = False
     if user_check['notification_feedback'] is None:
         pass

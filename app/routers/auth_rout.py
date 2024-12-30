@@ -27,12 +27,12 @@ async def post_login(request: Request, data: LoginData):
     # Проверка аутентификации
     user = await user_check_authentication(data.username, data.password)
     black_list_status = await status_authentication(data.username, data.password)
-    
-    if black_list_status[0] is None:
+
+    if black_list_status is None:
         await update_authentication(data.username, False, datetime.now())
         raise HTTPException(status_code=401, detail="Неверное имя пользователя или пароль")
         
-    if black_list_status[0]:
+    if black_list_status['blacklist']:
         await update_authentication(data.username, False, datetime.now())
         raise HTTPException(status_code=401, detail="Вы заблокированы")
     
@@ -80,16 +80,16 @@ async def logout(request: Request):
     return JSONResponse(content={'status': True})
     
 
-def get_current_user(request: Request):
+async def get_current_user(request: Request):
     """Проверка наличия активной сессии."""
     user = request.session.get("login")
     password = request.session.get("password")
-    black_list_status = synchronic_status_authentication(user, password)
+    black_list_status = await synchronic_status_authentication(user, password)
 
     if black_list_status is None:
         return None
     
-    if black_list_status[0]:
+    if black_list_status['blacklist']:
         request.session.clear()
         return None
         

@@ -467,3 +467,21 @@ async def notification_feedback_user(id_user: int):
     except Exception as error:
         print(f"Ошибка получения статуса уведомления: {error}")
         return False
+    
+    
+async def notification_user_false(id_user: int):
+    
+    query = """
+    UPDATE profile_user
+    SET notification_feedback = false
+    WHERE id = $1
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            await conn.execute(query, id_user)
+    except Exception as error:
+        print(f"Ошибка добавления отзыва: {error}")
+        
+    return True

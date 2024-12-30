@@ -449,3 +449,21 @@ async def select_user_photo():
     except Exception as error:
         print(f"Ошибка получения id фотографий клиентов: {error}")
         return []
+    
+    
+async def notification_feedback_user(id_user: int):
+    
+    query = """
+    SELECT notification_feedback
+    FROM profile_user
+    WHERE id = $1
+    """
+    
+    try:
+        pool = await User.connect()
+        async with pool.acquire() as conn:
+            check_notif = await conn.fetchrow(query, id_user)
+            return check_notif
+    except Exception as error:
+        print(f"Ошибка получения статуса уведомления: {error}")
+        return False

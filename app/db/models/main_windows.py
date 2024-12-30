@@ -123,6 +123,23 @@ async def price_list_update(id_name: int, name: str, price: int):
         print(f"Ошибка обновления прайс листа: {error}")
         
         
+async def price_list_price(id_name: int, price: int):
+    
+    query = """
+    SELECT price
+    FROM price_list
+    WHERE id_name = $1 AND price = $2
+    """
+    
+    try:
+        pool = await Win.connect()
+        async with pool.acquire() as conn:
+            status = await conn.fetch(query, id_name, price)
+            return status
+    except Exception as error:
+        print(f"Ошибка обновления прайс листа: {error}")
+        
+        
 async def price_list_delete(id_name: int):
     
     query = """

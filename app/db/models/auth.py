@@ -1,8 +1,4 @@
-import psycopg2
 from psycopg2 import Error, InterfaceError
-from app.config.config import config
-from collections import namedtuple
-from datetime import datetime
 from app.db.database import Authentication
 
 Auth = Authentication()
@@ -12,43 +8,34 @@ async def user_check_authentication(username: int, password: str):
     query = """
     SELECT login
     FROM authentication 
-    WHERE login = %s
-    AND password = %s
+    WHERE login = $1
+    AND password = $2
     """
     
     try:
-        with Auth._connect() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query, (username, password))
-                login = cursor.fetchone()
-            conn.commit()
-    except (InterfaceError, Error) as error:
-        print(f"Ошибка проверки пользователя аутентификация {error}")
-    finally:
-        if Auth._connection:
-            Auth._connection.close()
-                
-        return login
+        pool = await Auth.connect()
+        async with pool.acquire() as conn:
+            login = await conn.fetchrow(query, username, password)
+            return login
+    except Exception as error:
+        print(f"Ошибка проверки пользователя аутентификация: {error}")
+        return []
         
         
 async def update_authentication(username: int, status: bool, last_date):
     
     query = """
     UPDATE authentication
-    SET (status, last_date) = (%s, %s)
-    WHERE login = %s
+    SET (status, last_date) = ($1, $2)
+    WHERE login = $3
     """
-    
+            
     try:
-        with Auth._connect() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query, (status, last_date, username))
-            conn.commit()
-    except (InterfaceError, Error) as error:
-        print(f"Ошибка обновления пользователя аутентификация {error}")
-    finally:
-        if Auth._connection:
-            Auth._connection.close()
+        pool = await Auth.connect()
+        async with pool.acquire() as conn:
+            await conn.execute(query, status, last_date, username)
+    except Exception as error:
+        print(f"Ошибка обновления пользователя аутентификация: {error}")
             
 
 async def status_authentication(username: int, password: str):
@@ -58,44 +45,34 @@ async def status_authentication(username: int, password: str):
     FROM authentication AS a
     JOIN profile_user AS p
     ON a.login = p.id
-    WHERE a.login = %s AND a.password = %s)
+    WHERE a.login = $1 AND a.password = $2)
     """
     
     try:
-        with Auth._connect() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query, (username, password))
-                status = cursor.fetchone()
-            conn.commit()
-    except (InterfaceError, Error) as error:
-        print(f"Ошибка проверки статуса пользователя аутентификация {error}")
-    finally:
-        if Auth._connection:
-            Auth._connection.close()
-                
-        return status
+        pool = await Auth.connect()
+        async with pool.acquire() as conn:
+            status = await conn.fetchrow(query, username, password)
+            return status
+    except Exception as error:
+        print(f"Ошибка проверки статуса пользователя аутентификация: {error}")
+        return [True]
     
     
-def synchronic_status_authentication(username: int, password: str):
+async def synchronic_status_authentication(username: int, password: str):
     
     query = """
     SELECT blacklist FROM (SELECT a.login, p.blacklist
     FROM authentication AS a
     JOIN profile_user AS p
     ON a.login = p.id
-    WHERE a.login = %s AND a.password = %s)
+    WHERE a.login = $1 AND a.password = $2)
     """
     
     try:
-        with Auth._connect() as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query, (username, password))
-                status = cursor.fetchone()
-            conn.commit()
-    except (InterfaceError, Error) as error:
-        print(f"Ошибка проверки статуса пользователя аутентификация синхронный {error}")
-    finally:
-        if Auth._connection:
-            Auth._connection.close()
-                
-        return status
+        pool = await Auth.connect()
+        async with pool.acquire() as conn:
+            status = await conn.fetchrow(query, username, password)
+            return status
+    except Exception as error:
+        print(f"Ошибка проверки статуса пользователя аутентификация: {error}")
+        return None

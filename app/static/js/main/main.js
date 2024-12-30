@@ -407,3 +407,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+async function togglePulseDot() {
+    try {
+      const response = await fetch('/api/check-pulse-dot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      const show = data.show;
+  
+      const pulseDot = document.querySelector('.pulse-dot');
+      if (pulseDot) {
+        pulseDot.style.display = show ? 'inline-block' : 'none';
+      }
+  
+      return show;
+    } catch (error) {
+      console.error('Error:', error);
+      return false;
+    }
+  }
+  
+document.addEventListener('DOMContentLoaded', async function() {
+const showDot = await togglePulseDot();
+});

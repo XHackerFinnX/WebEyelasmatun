@@ -8,7 +8,8 @@ from datetime import datetime, timedelta
 from app.db.models.user import (update_name_user, update_telegram_user,
                             update_telephone_user, select_profile_user,
                             select_record_user, delete_record_user, count_del_visits,
-                            get_photo_from_db, notification_feedback_user)
+                            get_photo_from_db, notification_feedback_user,
+                            notification_user_false)
 from app.db.models.main_windows import windows_day_time, update_time_in_day
 from app.db.models.admin import admin_add_windows_day, admin_list
 from app.services.bot_notice import send_message_delete_user
@@ -198,3 +199,11 @@ async def post_check_pulse(user: dict = Depends(get_current_user)):
         status = True
     
     return JSONResponse(content={'show': status})
+
+
+@router.post('/api/check-price-update')
+async def check_price_update_post(user: dict = Depends(get_current_user)):
+    
+    await notification_user_false(user)
+    
+    return JSONResponse(content={'ok': True})

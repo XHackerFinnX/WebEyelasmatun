@@ -176,3 +176,27 @@ document.addEventListener('DOMContentLoaded', function() {
     loadPriceItems();
 });
 
+
+async function checkPriceUpdate() {
+    try {
+      const response = await fetch('/api/check-price-update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      return true;
+  
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+  
+document.addEventListener('DOMContentLoaded', async function() {
+    await checkPriceUpdate();
+});

@@ -148,6 +148,7 @@ async def schedule_record_user(date):
     JOIN profile_user AS pu
     ON ru.id = pu.id
     WHERE ru.date = %s
+    ORDER BY time ASC
     """
     
     try:

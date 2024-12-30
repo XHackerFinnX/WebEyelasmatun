@@ -256,3 +256,33 @@ async def price_delete(request: Request, itemId: int, user: dict = Depends(get_c
         return JSONResponse(content={'status': True})
     else:
         return JSONResponse(content={'status': False}, status_code=403)
+    
+
+@router.get('/contacts')
+async def main_get(request: Request, user: dict = Depends(get_current_user)):
+    
+    if user:
+        
+        admin_list_super = [i[0] for i in await admin_list('superadmin')]
+        admin_list_normal = [i[0] for i in await admin_list('admin')]
+        admin_list_full = admin_list_super + admin_list_normal
+        
+        if user in admin_list_full:
+            userP = "admin/" + str(user)
+            admin_or_user = 'admin'
+            
+        else:
+            userP = "users/" + str(user)
+            admin_or_user = 'user'
+        
+        return templates_main.TemplateResponse(
+            "contacts.html",
+            {
+                "request": request,
+                "user": userP,
+                "admin_or_user": admin_or_user
+            }
+        )
+    
+    else:
+        return templates_auth.TemplateResponse("auth.html", {"request": request})

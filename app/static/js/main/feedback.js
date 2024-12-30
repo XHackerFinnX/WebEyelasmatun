@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Prevent clicks inside the dropdown menu from closing it
     dropdownMenu.addEventListener('click', function(event) {
         event.stopPropagation();
     });
@@ -34,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
         dropdownMenu.style.top = header.offsetHeight + 'px';
     }
 
-    // Call this function on load and resize
     window.addEventListener('load', adjustDropdownPosition);
     window.addEventListener('resize', adjustDropdownPosition);
 
@@ -69,8 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentRating = 0;
     let currentFilter = 'new';
-    let currentPage = 1;
     let userId = 0;
+    let allFeedback = []; // Хранение всех отзывов
+    let visibleFeedbackCount = 0; // Сколько отзывов сейчас отображено
+
+    const FEEDBACK_STEP = 5; // Количество отзывов, отображаемых за один раз
 
     stars.forEach(star => {
         star.addEventListener('click', () => {
@@ -111,17 +112,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const icon = document.createElement('i');
             icon.className = 'fas fa-chevron-down';
             filterDropdownBtn.appendChild(icon);
-            currentPage = 1;
-            loadFeedback();
 
+            // Сброс видимых отзывов
+            visibleFeedbackCount = 0;
+            applyFilter();
             const filterDropdownContent = document.querySelector('.filter-dropdown-content');
             filterDropdownContent.style.display = 'none';
         });
     });
 
     loadMoreBtn.addEventListener('click', () => {
-        currentPage++;
-        loadFeedback(true);
+        showMoreFeedback();
     });
 
     document.addEventListener('click', (event) => {
@@ -153,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Спасибо за ваш отзыв :)');
                 loadFeedback();
             } else {
-                alert('Вы уже оставляли отзыв. Вы сможете оставить ещё один отзыв, если придете на запись к Eyelasmatun');
+                alert('Ошибка: вы уже оставляли отзыв.');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -161,37 +162,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function loadFeedback(append = false) {
+    async function loadFeedback() {
         try {
             const response = await fetch('/api/feedback/load', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ filteruser: currentFilter, page: currentPage }),
+                body: JSON.stringify({ filteruser: currentFilter }),
             });
 
             if (response.ok) {
                 const feedbackData = await response.json();
-                
-                const { feedback, hasMore, userId: fetchedUserId } = feedbackData;
-                userId = fetchedUserId;
-                if (!append) {
-                    feedbackList.innerHTML = '';
-                }
+                allFeedback = feedbackData.feedback; // Сохраняем все отзывы
+                userId = feedbackData.userId;
 
-                const sortedFeedback = sortFeedback(feedback);
-
-                sortedFeedback.forEach(item => {
-                    const feedbackItem = createFeedbackItem(item);
-                    feedbackList.appendChild(feedbackItem);
-                });
-
-                if (!hasMore) {
-                    loadMoreBtn.style.display = 'none';
-                } else {
-                    loadMoreBtn.style.display = 'block';
-                }
+                // Сбрасываем видимые отзывы и отображаем первые
+                visibleFeedbackCount = 0;
+                applyFilter();
             } else {
                 console.error('Failed to load feedback');
             }
@@ -200,11 +188,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function applyFilter() {
+        const sortedFeedback = sortFeedback(allFeedback);
+        feedbackList.innerHTML = ''; // Очистка списка отзывов
+        visibleFeedbackCount = 0; // Сбрасываем количество видимых отзывов
+        showMoreFeedback(sortedFeedback);
+    }
+
+    function showMoreFeedback(filteredFeedback = sortFeedback(allFeedback)) {
+        const remainingFeedback = filteredFeedback.slice(visibleFeedbackCount, visibleFeedbackCount + FEEDBACK_STEP);
+
+        remainingFeedback.forEach(item => {
+            const feedbackItem = createFeedbackItem(item);
+            feedbackList.appendChild(feedbackItem);
+        });
+
+        visibleFeedbackCount += remainingFeedback.length;
+
+        // Скрываем кнопку "Ещё", если отзывы закончились
+        if (visibleFeedbackCount >= filteredFeedback.length) {
+            loadMoreBtn.style.display = 'none';
+        } else {
+            loadMoreBtn.style.display = 'block';
+        }
+    }
+
+    function parseDate(dateString) {
+        // Разбиваем строку на день, месяц, год
+        const [day, month, year] = dateString.split('.').map(Number);
+        // Создаем объект Date (месяцы начинаются с 0)
+        return new Date(year, month - 1, day);
+    }
+
     function sortFeedback(feedback) {
         if (currentFilter === 'new') {
-            return feedback.sort((a, b) => new Date(b.date) - new Date(a.date));
+            // Сортировка по убыванию даты
+            return feedback.sort((a, b) => parseDate(b.date) - parseDate(a.date));
         } else if (currentFilter === 'old') {
-            return feedback.sort((a, b) => new Date(a.date) - new Date(b.date));
+            // Сортировка по возрастанию даты
+            return feedback.sort((a, b) => parseDate(a.date) - parseDate(b.date));
         } else if (currentFilter === 'high') {
             return feedback.sort((a, b) => b.rating - a.rating);
         } else if (currentFilter === 'low') {

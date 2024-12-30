@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Спасибо за ваш отзыв :)');
                 loadFeedback();
             } else {
-                alert('Ошибка: вы уже оставляли отзыв.');
+                alert('Ошибка: вы уже оставляли отзыв. Чтобы оставить ещё раз отзыв, запишитесь к Eyelasmatun');
             }
         } catch (error) {
             console.error('Error:', error);

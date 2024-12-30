@@ -18,7 +18,6 @@ class FeedbackUser(BaseModel):
     
 class FeedbackFilter(BaseModel):
     filteruser: str
-    page: int
 
 templates_admin = Jinja2Templates(directory=r"./app/templates/admin")
 templates_main = Jinja2Templates(directory=r"./app/templates/main")
@@ -120,7 +119,7 @@ async def feedback_download(data: FeedbackFilter, user: dict = Depends(get_curre
             user_d = {
                 'id': lf['id'],
                 'name': lf['name'],
-                'date': lf['date_feedback'].strftime("%Y-%m-%d"),
+                'date': lf['date_feedback'].strftime("%d.%m.%Y"),
                 'avatar': avatar,
                 'rating': lf['stars'],
                 'text': lf['text_feedback']
@@ -129,7 +128,6 @@ async def feedback_download(data: FeedbackFilter, user: dict = Depends(get_curre
             
         return JSONResponse(content={
             'feedback': list_feedback,
-            'hasMore': True,
             'userId': user
         })
         

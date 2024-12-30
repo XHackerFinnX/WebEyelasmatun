@@ -7,11 +7,14 @@ from datetime import datetime, timedelta
 from app.db.models.main_windows import (windows_day, windows_day_time, 
                                     price_list_load, price_list_add, 
                                     price_list_check, price_list_update, price_list_delete,
-                                    price_list_select_user)
+                                    price_list_select_user, price_list_price)
 from app.db.models.user import update_last_visit_user, add_record_user, check_record_time
-from app.db.models.admin import select_day_time, update_windows_day, admin_delete_windows_day, admin_list
+from app.db.models.admin import (select_day_time, update_windows_day,
+                                 admin_delete_windows_day, admin_list,
+                                 select_user_all)
 from app.utils.ip_address import get_ip
 from app.services.push_service import push_sms
+from app.services.bot_notice import send_message_mail_notification_price
 
 import asyncio
 
@@ -232,7 +235,15 @@ async def price_load_post():
 async def price_save_post(data: PriceItem):
     
     if await price_list_check(data.id):
+        
+        price_update = await price_list_price(data.id, data.price)
         await price_list_update(data.id, data.name, data.price)
+
+        if not price_update:
+            print('Изменения в прайс-листе')
+            id_user_all = await select_user_all()
+            asyncio.create_task(send_message_mail_notification_price(id_user_all))
+            
     else:
         await price_list_add(data.id, data.name, data.price)
     

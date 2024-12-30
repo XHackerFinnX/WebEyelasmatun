@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from app.db.models.user import (update_name_user, update_telegram_user,
                             update_telephone_user, select_profile_user,
                             select_record_user, delete_record_user, count_del_visits,
-                            get_photo_from_db)
+                            get_photo_from_db, notification_feedback_user)
 from app.db.models.main_windows import windows_day_time, update_time_in_day
 from app.db.models.admin import admin_add_windows_day, admin_list
 from app.services.bot_notice import send_message_delete_user
@@ -184,3 +184,16 @@ async def get_photo(user_id: int):
     # Определение типа содержимого по имени файла
     content_type = "image/jpeg" if file_name.lower().endswith(".jpg") else "image/png"
     return Response(content=file_data, media_type=content_type)
+
+
+@router.post('/api/check-pulse-dot')
+async def post_check_pulse(user: dict = Depends(get_current_user)):
+    
+    user_check = await notification_feedback_user(user)
+    status = False
+    if user_check['notification_feedback'] is None:
+        pass
+    elif user_check['notification_feedback']:
+        status = True
+    
+    return JSONResponse(content={'show': status})

@@ -436,63 +436,61 @@ button[type="submit"]:hover {
     button[type="submit"] {
         width: 100%;
     }
-}
 
+    .feedback-item {
+        background-color: var(--tile-color);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feedback-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feedback-item-user {
+        display: flex;
+        align-items: center;
+    }
+    
+    .feedback-item-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 1rem;
+    }
+    
+    .feedback-item-name {
+        font-weight: bold;
+    }
+    
+    .feedback-item-date {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .feedback-item-rating {
+        margin-bottom: 0.5rem;
+    }
+    
+    .feedback-item-text {
+        margin-top: 0.5rem;
+    }
 
-/* Общие стили для меню с действиями */
-.feedback-actions {
-    position: relative;
-    cursor: pointer;
-}
-
-.feedback-actions .fa-ellipsis-v {
-    font-size: 18px;
-    color: #333;
-    transform: translate(50%, -50%); /* Сдвигаем иконку троеточия */
-}
-
-/* Стили для меню действий */
-.actions-menu {
-    display: none;
-    position: absolute;
-    top: 20px;
-    right: 0;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-}
-
-.actions-menu.visible {
-    display: block;
-}
-
-/* Стили для кнопок в меню */
-.actions-menu button {
-    background: none;
-    border: none;
-    padding: 8px 16px;
-    text-align: left;
-    cursor: pointer;
-    width: 100%;
-    font-size: 14px;
-}
-
-.actions-menu button:hover {
-    background-color: #f4f4f4;
-}
-
-.actions-menu button.edit-feedback {
-    color: #4caf50;
-}
-
-.actions-menu button.delete-feedback {
-    color: #f44336;
-}
-
-.actions-menu button:focus {
-    outline: none;
+    .starf {
+        font-size: 1.5rem;
+        color: #ccc;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+    
+    .starf.active {
+        color: gold;
+    }
 }
 
 .pulse-dot {

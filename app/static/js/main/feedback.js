@@ -240,18 +240,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const item = document.createElement('div');
         item.className = 'feedback-item';
         item.innerHTML = `
-            <div class="feedback-header">
-                <div class="feedback-avatar-container">
-                    <img src="${feedback.avatar}" alt="${feedback.name}" class="feedback-avatar">
-                    <span class="feedback-date">${feedback.date}</span>
+            <div class="feedback-item-header">
+                <div class="feedback-item-user">
+                    <img src="${feedback.avatar}" alt="${feedback.name}" class="feedback-item-avatar">
+                    <span class="feedback-item-name">${feedback.name}</span>
                 </div>
+                <span class="feedback-item-date">${feedback.date}</span>
             </div>
-            <span class="feedback-name">${feedback.name}</span>
-            <div class="feedback-stars">
+            <div class="feedback-item-rating">
                 ${createStars(feedback.rating)}
-                <span class="feedback-rating">${feedback.rating}</span>
             </div>
-            <div class="feedback-text">${feedback.text}</div>
+            <div class="feedback-item-text">${feedback.text}</div>
         `;
         return item;
     }
@@ -259,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function createStars(rating) {
         let stars = '';
         for (let i = 1; i <= 5; i++) {
-            stars += `<span class="star ${i <= rating ? 'active' : ''}"">&#9733;</span>`;
+            stars += `<span class="starf ${i <= rating ? 'active' : ''}"">&#9733;</span>`;
         }
         return stars;
     }

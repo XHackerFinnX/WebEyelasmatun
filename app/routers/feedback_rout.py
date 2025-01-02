@@ -111,6 +111,7 @@ async def feedback_download(data: FeedbackFilter, user: dict = Depends(get_curre
             
             for pu in photo_user:
                 if pu['id'] == lf['id']:
+                    # Ссылка на запрос аватара
                     avatar = avatar = f'http://127.0.0.1:8000/api/photos/{pu['id']}'
                     break
             else:

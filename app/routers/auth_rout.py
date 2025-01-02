@@ -85,14 +85,17 @@ async def get_current_user(request: Request):
     user = request.session.get("login")
     password = request.session.get("password")
     black_list_status = await synchronic_status_authentication(user, password)
-
-    if black_list_status['blacklist'] is None:
-        request.session.clear()
+    try:
+        if black_list_status['blacklist'] is None:
+            request.session.clear()
+            return None
+        
+        if black_list_status['blacklist']:
+            request.session.clear()
+            return None
+    except TypeError:
         return None
-    
-    if black_list_status['blacklist']:
-        request.session.clear()
-        return None
+        
         
     if not user:
         request.session.clear()

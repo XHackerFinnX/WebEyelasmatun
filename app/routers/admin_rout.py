@@ -18,7 +18,7 @@ from collections import namedtuple
 from app.services.bot_notice import send_message_mail, send_message_private, send_message_delete_admin
 from app.services.push_service import push_sms_technic
 
-import calendar, locale
+import calendar
 import asyncio
 
 router = APIRouter(
@@ -63,8 +63,6 @@ class DateRange(BaseModel):
 templates_admin = Jinja2Templates(directory=r"./app/templates/admin")
 templates_main = Jinja2Templates(directory=r"./app/templates/main")
 templates_auth = Jinja2Templates(directory=r"./app/templates/auth")
-
-locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 
 @router.get('/profile')
 async def profile_error_get(request: Request, user: dict = Depends(get_current_user)):
@@ -527,9 +525,12 @@ async def visit_history_user_post(id_user: int, user: dict = Depends(get_current
             
         weekd = hu[0].weekday()
         
+        rus_week = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
+        
         for i, name_w in enumerate(calendar.day_name):
             if i == weekd:
-                name_week = name_w.capitalize()
+                name_week = rus_week[i].capitalize()
+                # name_week = name_w.capitalize()
                 break
         
         history_dict = {

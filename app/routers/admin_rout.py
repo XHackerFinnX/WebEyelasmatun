@@ -469,6 +469,11 @@ async def client_info_post(id_user: int, user: dict = Depends(get_current_user))
     Data = namedtuple('Data', ['last_site_visit', 'last_entry', 'quantity_visits', 'quantity_cancel', 'blacklist', 'ip_address'])
     data = Data(*data_user_list[0])
     
+    if data.last_site_visit is None:
+        dsv = 'нет'
+    else:
+        dsv = data.last_site_visit.strftime('%d.%m.%Y %H:%M')
+    
     if data.last_entry is None:
         dle = 'нет'
     else:
@@ -485,7 +490,7 @@ async def client_info_post(id_user: int, user: dict = Depends(get_current_user))
         dqc = data.quantity_cancel
     
     data_dict = {
-        "lastVisit": data.last_site_visit.strftime('%d.%m.%Y %H:%M'),
+        "lastVisit": dsv,
         "lastAppointment": dle,
         "visitCount": dqv,
         "cancelCount": dqc,

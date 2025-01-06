@@ -488,6 +488,17 @@ async def client_info_post(id_user: int, user: dict = Depends(get_current_user))
         dqc = '0'
     else:
         dqc = data.quantity_cancel
+        
+    if data.ip_address is None:
+        dia0 = 'Засекречен'
+        dia3 = '-'
+        dia1 = '-'
+        dia2 = '-'
+    else:
+        dia0 = data.ip_address[0]
+        dia3 = data.ip_address[3]
+        dia1 = data.ip_address[1]
+        dia2 = data.ip_address[2]
     
     data_dict = {
         "lastVisit": dsv,
@@ -495,9 +506,9 @@ async def client_info_post(id_user: int, user: dict = Depends(get_current_user))
         "visitCount": dqv,
         "cancelCount": dqc,
         "isBlacklisted": data.blacklist,
-        "ipAddress": data.ip_address[0],
-        "country": data.ip_address[3],
-        "city": data.ip_address[1] + " " + data.ip_address[2]
+        "ipAddress": dia0,
+        "country": dia3,
+        "city": dia1 + " " + dia2
     }
     
     return JSONResponse(content=data_dict)

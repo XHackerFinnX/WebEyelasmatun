@@ -1,10 +1,13 @@
 from app.config.config import config
 from app.db.models.user import notification_user_true
+from app.utils.log import setup_logger
 
 import requests
 import asyncio
 
 API_URL = 'https://api.telegram.org/bot'
+
+logger = setup_logger("Main")
 
 async def send_message_mail(chat_id_list: list, chat_id_admin: list, text: str):
     
@@ -104,5 +107,6 @@ async def send_message_mail_notification_price(chat_id_list: list):
             pass
         await notification_user_true(chat_id[0])
         await asyncio.sleep(0.5)
-        
+    
+    logger.info('Уведомления о изменение цены всем отправлено и пришло')
     return

@@ -1,7 +1,10 @@
 from datetime import datetime
 from app.db.database import Windows
+from zoneinfo import ZoneInfo
+from datetime import datetime
 
 Win = Windows()
+piter_tz = ZoneInfo("Europe/Moscow")
 
 async def windows_day():
     
@@ -11,10 +14,12 @@ async def windows_day():
     WHERE date >= $1
     """
     
+    current_date = datetime.now(piter_tz).date()
+    
     try:
         pool = await Win.connect()
         async with pool.acquire() as conn:
-            day = await conn.fetch(query, datetime.today().date())
+            day = await conn.fetch(query, current_date)
             return day
     except Exception as error:
         print(f"Ошибка получения дат для отображения свободных окошек: {error}")

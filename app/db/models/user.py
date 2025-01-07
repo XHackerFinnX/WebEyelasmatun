@@ -1,5 +1,7 @@
 from app.db.database import User
+from app.utils.log import setup_logger
 
+logger = setup_logger("DBUser")
 
 User = User()
 
@@ -63,7 +65,10 @@ async def update_name_user(name: str, id_user: int):
         pool = await User.connect()
         async with pool.acquire() as conn:
             await conn.execute(query, name, id_user)
+            
+        logger.info(f"Изменения userName успешно внесены. логин: {id_user}")
     except Exception as error:
+        logger.error(f"Ошибка обновления userName. логин: {id_user}")
         print(f"Ошибка обновления имени: {error}")
     
 async def update_telegram_user(telegram: str, id_user: int):
@@ -77,7 +82,10 @@ async def update_telegram_user(telegram: str, id_user: int):
         pool = await User.connect()
         async with pool.acquire() as conn:
             await conn.execute(query, telegram, id_user)
+            
+        logger.info(f"Изменения userTg успешно внесены. логин: {id_user}")
     except Exception as error:
+        logger.error(f"Ошибка обновления userTg. логин: {id_user}")
         print(f"Ошибка обновления телеграмма: {error}")
     
 async def update_telephone_user(telephone: str, id_user: int):
@@ -91,7 +99,10 @@ async def update_telephone_user(telephone: str, id_user: int):
         pool = await User.connect()
         async with pool.acquire() as conn:
             await conn.execute(query, telephone, id_user)
+            
+        logger.info(f"Изменения userPhone успешно внесены. логин: {id_user}")
     except Exception as error:
+        logger.error(f"Ошибка обновления userPhone. логин: {id_user}")
         print(f"Ошибка обновления номера телефона: {error}")
         
         

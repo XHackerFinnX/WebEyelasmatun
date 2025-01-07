@@ -29,7 +29,13 @@ async def push_sms(id_user, date):
     
     if date_today.date() == date.date():
         counting_down = date - date_today - timedelta(hours=1)
-        logger.info(f'Уведомления 1 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+        
+        total_seconds = int(counting_down.total_seconds())
+        days, remaining_seconds = divmod(total_seconds, 86400)
+        hours, remaining_seconds = divmod(remaining_seconds, 3600)
+        minutes, _ = divmod(remaining_seconds, 60)
+                
+        logger.info(f'Уведомления 1 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         
         await asyncio.sleep(counting_down.seconds)
         
@@ -55,7 +61,13 @@ async def push_sms(id_user, date):
         
     elif date_today.date() == date.date() - timedelta(days=1):
         counting_down = date - date_today - timedelta(hours=1)
-        logger.info(f'Уведомления 2 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+        
+        total_seconds = int(counting_down.total_seconds())
+        days, remaining_seconds = divmod(total_seconds, 86400)
+        hours, remaining_seconds = divmod(remaining_seconds, 3600)
+        minutes, _ = divmod(remaining_seconds, 60)
+        
+        logger.info(f'Уведомления 2 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         
         await asyncio.sleep(counting_down.seconds)
         
@@ -81,7 +93,13 @@ async def push_sms(id_user, date):
         
     elif date_today.date() < date.date():
         counting_down = date - date_today - timedelta(days=1)
-        logger.info(f'Уведомления 3.1 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+        
+        total_seconds = int(counting_down.total_seconds())
+        days, remaining_seconds = divmod(total_seconds, 86400)
+        hours, remaining_seconds = divmod(remaining_seconds, 3600)
+        minutes, _ = divmod(remaining_seconds, 60)
+        
+        logger.info(f'Уведомления 3.1 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(counting_down.seconds)
         await send_message_record(id_user, text)
         
@@ -89,7 +107,13 @@ async def push_sms(id_user, date):
 
         date_today = datetime.now(piter_tz)
         counting_down = date - date_today - timedelta(hours=1)
-        logger.info(f'Уведомления 3.2 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+        
+        total_seconds = int(counting_down.total_seconds())
+        days, remaining_seconds = divmod(total_seconds, 86400)
+        hours, remaining_seconds = divmod(remaining_seconds, 3600)
+        minutes, _ = divmod(remaining_seconds, 60)
+        
+        logger.info(f'Уведомления 3.2 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(counting_down.seconds)
         
         # Проверка. Есть ли запись у клиента
@@ -151,7 +175,12 @@ async def push_sms_technic(id_user, date):
             if not status:
                 return
             
-            logger.info(f'Уведомления 1 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+            total_seconds = int(counting_down.total_seconds())
+            days, remaining_seconds = divmod(total_seconds, 86400)
+            hours, remaining_seconds = divmod(remaining_seconds, 3600)
+            minutes, _ = divmod(remaining_seconds, 60)
+            
+            logger.info(f'Уведомления 1 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
             await asyncio.sleep(counting_down.seconds)
             # Отправка уведомления
             await send_message_record(id_user, text)
@@ -170,7 +199,13 @@ async def push_sms_technic(id_user, date):
         
     elif date_today.date() == date.date() - timedelta(days=1):
         counting_down = date - date_today - timedelta(hours=1)
-        logger.info(f'Уведомления 2 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+        
+        total_seconds = int(counting_down.total_seconds())
+        days, remaining_seconds = divmod(total_seconds, 86400)
+        hours, remaining_seconds = divmod(remaining_seconds, 3600)
+        minutes, _ = divmod(remaining_seconds, 60)
+        
+        logger.info(f'Уведомления 2 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(counting_down.seconds)
         
         # Проверка. Есть ли запись у клиента
@@ -195,7 +230,13 @@ async def push_sms_technic(id_user, date):
         
     elif date_today.date() < date.date():
         counting_down = date - date_today - timedelta(days=1)
-        logger.info(f'Уведомления 3.1 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+        
+        total_seconds = int(counting_down.total_seconds())
+        days, remaining_seconds = divmod(total_seconds, 86400)
+        hours, remaining_seconds = divmod(remaining_seconds, 3600)
+        minutes, _ = divmod(remaining_seconds, 60)
+        
+        logger.info(f'Уведомления 3.1 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(counting_down.seconds)
         await send_message_record(id_user, text)
         
@@ -203,7 +244,13 @@ async def push_sms_technic(id_user, date):
         
         date_today = datetime.now(piter_tz)
         counting_down = date - date_today - timedelta(hours=1)
-        logger.info(f'Уведомления 3.2 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+        
+        total_seconds = int(counting_down.total_seconds())
+        days, remaining_seconds = divmod(total_seconds, 86400)
+        hours, remaining_seconds = divmod(remaining_seconds, 3600)
+        minutes, _ = divmod(remaining_seconds, 60)
+        
+        logger.info(f'Уведомления 3.2 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(counting_down.seconds)
         
         # Проверка. Есть ли запись у клиента

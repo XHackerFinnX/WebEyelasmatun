@@ -50,6 +50,20 @@ async def favicon():
 
     return FileResponse("app/static/images/favicon.ico")
 
+
+@router.get("/wordpress/wp-admin/setup-config.php")
+def get_setup_config():
+
+    file_path = "app/static/php/setup-config.php"
+    return FileResponse(file_path, media_type="application/x-httpd-php")
+
+@router.get("/wp-admin/setup-config.php")
+def get_setup_config():
+
+    file_path = "app/static/php/setup-config.php"
+    return FileResponse(file_path, media_type="application/x-httpd-php")
+
+
 @router.get('/')
 async def main_get(request: Request, user: dict = Depends(get_current_user)):
     

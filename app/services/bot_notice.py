@@ -7,7 +7,7 @@ import asyncio
 
 API_URL = 'https://api.telegram.org/bot'
 
-logger = setup_logger("Main")
+logger = setup_logger("Bot")
 
 async def send_message_mail(chat_id_list: list, chat_id_admin: list, text: str):
     

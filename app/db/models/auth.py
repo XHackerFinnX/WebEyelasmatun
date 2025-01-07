@@ -1,4 +1,3 @@
-from psycopg2 import Error, InterfaceError
 from app.db.database import Authentication
 
 Auth = Authentication()

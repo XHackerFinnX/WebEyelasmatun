@@ -1,4 +1,3 @@
-from psycopg2 import Error, InterfaceError
 from datetime import datetime
 from app.db.database import Windows
 

@@ -128,7 +128,8 @@ async def push_sms_technic(id_user, date):
             status = await check_record_user_before_notification(id_user, date_r, time_r)
             if not status:
                 return
-
+            
+            await asyncio.sleep(counting_down.seconds)
             # Отправка уведомления
             await send_message_record(id_user, text)
             

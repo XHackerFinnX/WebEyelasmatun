@@ -5,13 +5,14 @@ from pydantic import BaseModel
 from app.db.models.auth import (user_check_authentication, update_authentication,
                             status_authentication, synchronic_status_authentication)
 from datetime import datetime
-
-import asyncio
+from app.utils.log import setup_logger
 
 router = APIRouter(
     prefix="",
     tags=["Auth"]
 )
+
+logger = setup_logger("Auth")
 
 templates = Jinja2Templates(directory=r"./app/templates/auth")
 
@@ -25,15 +26,22 @@ class LoginData(BaseModel):
 async def post_login(request: Request, data: LoginData):
     
     # Проверка аутентификации
+    logger.info(f"Пользователь ввел данные для входа. логин: {data.username} пароль: {data.password}")
     user = await user_check_authentication(data.username, data.password)
+    logger.info(f"Получение пользователя {data.username} из user_check_authentication {user}")
+    
+    logger.info(f"Проверка стутуса ЧС пользователя. логин: {data.username} пароль: {data.password}")
     black_list_status = await status_authentication(data.username, data.password)
+    logger.info(f"Получение статуса ЧС пользователя {data.username} из status_authentication {black_list_status}")
 
     if black_list_status is None:
         await update_authentication(data.username, False, datetime.now())
+        logger.warning(f"Пользователь неверно ввел имя или пароль. логин: {data.username} пароль: {data.password}")
         raise HTTPException(status_code=401, detail="Неверное имя пользователя или пароль")
         
     if black_list_status['blacklist']:
         await update_authentication(data.username, False, datetime.now())
+        logger.warning(f"Пользователь заблокирован. логин: {data.username}")
         raise HTTPException(status_code=401, detail="Вы заблокированы")
     
     if user is None:
@@ -50,11 +58,12 @@ async def post_login(request: Request, data: LoginData):
         }
         # Обновление статуса, что пользователь вошел и находится на сайте.
         # Также время когда он зашел
+        logger.info(f"Пользователь успешно авторизовался. логин: {data.username}")
         await update_authentication(data.username, True, datetime.now())
         
     if dict_user:
         request.session.update(dict_user) # Создание сессии
-        
+
         return JSONResponse(content={"message": "Успешная аутентификация"})
     else:
         
@@ -75,6 +84,7 @@ async def logout(request: Request):
     
     # Обновление статуса, что пользователь вышел из сайта.
     # Также время когда он вышел
+    logger.info(f"Пользователь вышел из сайта. логин: {user}")
     await update_authentication(user, False, datetime.now())
     
     return JSONResponse(content={'status': True})

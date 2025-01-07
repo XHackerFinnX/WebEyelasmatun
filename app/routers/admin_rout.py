@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List
 from app.routers.auth_rout import get_current_user
-from datetime import datetime, timedelta
+from datetime import datetime
 from app.db.models.admin import (admin_add_windows_day, check_windows_day,
                              update_windows_day, admin_delete_windows_day,
                              schedule_record_user, admin_list, select_user_all,
@@ -17,14 +17,18 @@ from app.db.models.main_windows import update_time_in_day, windows_day_time
 from collections import namedtuple
 from app.services.bot_notice import send_message_mail, send_message_private, send_message_delete_admin
 from app.services.push_service import push_sms_technic
+from app.utils.log import setup_logger
 
 import calendar
 import asyncio
+import pprint
 
 router = APIRouter(
     prefix="",
     tags=["Admin"]
 )
+
+logger = setup_logger("Admin")
 
 class AddDay(BaseModel):
     date: str
@@ -68,6 +72,7 @@ templates_auth = Jinja2Templates(directory=r"./app/templates/auth")
 async def profile_error_get(request: Request, user: dict = Depends(get_current_user)):
     
     if user:
+        logger.error(f'Пользователь попал на error сайт. логин: {user}')
         return templates_main.TemplateResponse("error.html", {"request": request})
     
     else:
@@ -637,9 +642,15 @@ async def notifications_start(user: dict = Depends(get_current_user)):
             date_r = lur[1]
             time_r = datetime.strptime(lur[2].split('T')[1][:-3], '%H:%M')
             date_full = datetime.combine(date_r, time_r.time())
-            print(lur[0], date_full)
+
             asyncio.create_task(push_sms_technic(lur[0], date_full))
 
+        logger.info('Отправка уведомлений через техническую кнопку')
+        try:
+            pprint.pprint(list_user_record)
+        except:
+            print(list_user_record)
+        
         return JSONResponse(content={'status': True})
     
     else:

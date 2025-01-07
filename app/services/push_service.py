@@ -29,6 +29,8 @@ async def push_sms(id_user, date):
     
     if date_today.date() == date.date():
         counting_down = date - date_today - timedelta(hours=1)
+        logger.info(f'Уведомления 1 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+        
         await asyncio.sleep(counting_down.seconds)
         
         # Проверка. Есть ли запись у клиента
@@ -53,6 +55,8 @@ async def push_sms(id_user, date):
         
     elif date_today.date() == date.date() - timedelta(days=1):
         counting_down = date - date_today - timedelta(hours=1)
+        logger.info(f'Уведомления 2 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+        
         await asyncio.sleep(counting_down.seconds)
         
         # Проверка. Есть ли запись у клиента
@@ -77,14 +81,15 @@ async def push_sms(id_user, date):
         
     elif date_today.date() < date.date():
         counting_down = date - date_today - timedelta(days=1)
+        logger.info(f'Уведомления 3.1 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(counting_down.seconds)
         await send_message_record(id_user, text)
         
         logger.info(f'Уведомления 3.1 о записи прошло. Логин: {id_user} Дата записи: {date}')
 
-        
         date_today = datetime.now(piter_tz)
         counting_down = date - date_today - timedelta(hours=1)
+        logger.info(f'Уведомления 3.2 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(counting_down.seconds)
         
         # Проверка. Есть ли запись у клиента
@@ -146,6 +151,7 @@ async def push_sms_technic(id_user, date):
             if not status:
                 return
             
+            logger.info(f'Уведомления 1 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
             await asyncio.sleep(counting_down.seconds)
             # Отправка уведомления
             await send_message_record(id_user, text)
@@ -164,6 +170,7 @@ async def push_sms_technic(id_user, date):
         
     elif date_today.date() == date.date() - timedelta(days=1):
         counting_down = date - date_today - timedelta(hours=1)
+        logger.info(f'Уведомления 2 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(counting_down.seconds)
         
         # Проверка. Есть ли запись у клиента
@@ -188,6 +195,7 @@ async def push_sms_technic(id_user, date):
         
     elif date_today.date() < date.date():
         counting_down = date - date_today - timedelta(days=1)
+        logger.info(f'Уведомления 3.1 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(counting_down.seconds)
         await send_message_record(id_user, text)
         
@@ -195,6 +203,7 @@ async def push_sms_technic(id_user, date):
         
         date_today = datetime.now(piter_tz)
         counting_down = date - date_today - timedelta(hours=1)
+        logger.info(f'Уведомления 3.2 запущено. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(counting_down.seconds)
         
         # Проверка. Есть ли запись у клиента

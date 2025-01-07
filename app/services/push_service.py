@@ -23,6 +23,7 @@ async def push_sms(id_user, date):
     time_r = date.isoformat()
     piter_tz = ZoneInfo("Europe/Moscow")
     date_today = datetime.now(piter_tz)
+    date = date.replace(tzinfo=piter_tz)
     
     logger.info(f'Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
     
@@ -117,6 +118,7 @@ async def push_sms_technic(id_user, date):
     time_r = date.isoformat()
     piter_tz = ZoneInfo("Europe/Moscow")
     date_today = datetime.now(piter_tz)
+    date = date.replace(tzinfo=piter_tz)
     
     logger.info(f'Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
     

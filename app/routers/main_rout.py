@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Depends
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
 from app.routers.auth_rout import get_current_user
 from datetime import datetime, timedelta
@@ -15,6 +15,7 @@ from app.db.models.admin import (select_day_time, update_windows_day,
 from app.utils.ip_address import get_ip
 from app.services.push_service import push_sms
 from app.services.bot_notice import send_message_mail_notification_price
+from app.utils.log import setup_logger
 
 import asyncio
 
@@ -22,6 +23,8 @@ router = APIRouter(
     prefix="",
     tags=["Main"]
 )
+
+logger = setup_logger("Main")
 
 class RecordUser(BaseModel):
     date: str
@@ -64,6 +67,7 @@ async def main_get(request: Request, user: dict = Depends(get_current_user)):
             userP = "users/" + str(user)
             admin_or_user = 'user'
         
+        logger.info(f"Пользователь зашел на главную страницу. логин: {user}")
         return templates_main.TemplateResponse(
             "main.html",
             {
@@ -100,7 +104,7 @@ async def time_record(timeday: TimeDay):
 async def record_post(request: Request, data_record: RecordUser, user: dict = Depends(get_current_user)):
     
     if user:
-        
+        logger.info(f"Пользователь отправил запрос на запись {data_record}. логин: {user}")
         date_r = datetime.strptime(data_record.date, '%Y-%m-%d') + timedelta(days=1)
         time_r = datetime.strptime(data_record.time, '%H:%M')
         date_full = datetime.combine(date_r, time_r.time())
@@ -111,14 +115,18 @@ async def record_post(request: Request, data_record: RecordUser, user: dict = De
         date_today = datetime.now()
         date_minus_hours_3 = date_full - timedelta(hours=3)
 
+        logger.info(f'Дата записи {date_full}, дата сегодня {date_today}, дата -3 часа {date_minus_hours_3}. логин: {user}')
         if date_today > date_full:
+            logger.warning(f"Ошибка записи. Пользователь пытался записаться date_today > date_full {date_today} > {date_full}. логин: {user}")
             return JSONResponse(content={"success": False})
         
         if date_today > date_minus_hours_3:
             return JSONResponse(content={"success": False})
         
         try:
+            logger.info(f'Проверка окошки для записи. логин: {user}')
             if await check_record_time(user, date_r, date_full) is None:
+                logger.info(f'Добавление записи пользователя. логин: {user}')
                 await add_record_user(user, date_r, date_full, comment_r, True)
                 
                 time_list: list = await select_day_time(date_r)
@@ -133,10 +141,13 @@ async def record_post(request: Request, data_record: RecordUser, user: dict = De
                     
                 asyncio.create_task(push_sms(user, date_full))
                 
+                logger.info(f'Отправка уведомления и успешная запись. логин: {user}')
                 return JSONResponse(content={"success": True})
             else:
+                logger.warning(f'Окошка для записи нет. логин: {user}')
                 return JSONResponse(content={"success": False})
         except:
+            logger.error(f'Ошибка записи на время {data_record}. логин: {user}')
             return JSONResponse(content={"success": False})
         
     else:
@@ -161,7 +172,8 @@ async def pricelist_get(request: Request, username: int, user: dict = Depends(ge
             userP = "users/" + str(username)
             admin_or_user = 'user'
             price_html = 'pricelistuser.html'
-    
+
+        logger.info(f'Пользователь admin зашел на страницу Прайс-лист. логин: {user}')
         return templates_main.TemplateResponse(
             price_html,
             {
@@ -193,7 +205,8 @@ async def pricelist_get(request: Request, username: int, user: dict = Depends(ge
             admin_or_user = 'user'
             price_html = 'pricelistuser.html'
             pl_user = await price_list_select_user()
-    
+
+        logger.info(f'Пользователь user зашел на страницу Прайс-лист. логин: {user}')
         return templates_main.TemplateResponse(
             price_html,
             {
@@ -218,6 +231,7 @@ async def save_ip(request: Request, user: dict = Depends(get_current_user)):
 @router.post('/api/price-load-items')
 async def price_load_post():
     
+    logger.info("Отправлен запрос на загрузку прайс-листа для админа")
     price_list = await price_list_load()
     pl_list = []
     for pl in price_list:
@@ -228,12 +242,14 @@ async def price_load_post():
         }
         pl_list.append(pl_dict)
     
+    logger.info("Запрос на загрузку прайс-листа выполнен")
     return JSONResponse(content=pl_list)
     
 
 @router.post('/api/price-items')
 async def price_save_post(data: PriceItem):
     
+    logger.info(f"Отправлен запрос на сохранение прайса")
     if await price_list_check(data.id):
         
         price_update = await price_list_price(data.id, data.price)
@@ -241,10 +257,13 @@ async def price_save_post(data: PriceItem):
 
         if not price_update:
             print('Изменения в прайс-листе')
+            logger.info('Отправка уведомления пользователем о изменении цены')
             id_user_all = await select_user_all()
             asyncio.create_task(send_message_mail_notification_price(id_user_all))
+            logger.info('Отправка совершена')
             
     else:
+        logger.info(f"Добавлен новый прайс")
         await price_list_add(data.id, data.name, data.price)
     
     return JSONResponse(content={'status': True})
@@ -263,6 +282,7 @@ async def price_delete(request: Request, itemId: int, user: dict = Depends(get_c
         return templates_auth.TemplateResponse("auth.html", {"request": request})
     
     if user in admin_list_full:
+        logger.info(f"Удаление одного пункта из прайс-листа. логин: {user}")
         await price_list_delete(itemId)
         return JSONResponse(content={'status': True})
     else:
@@ -286,6 +306,7 @@ async def main_get(request: Request, user: dict = Depends(get_current_user)):
             userP = "users/" + str(user)
             admin_or_user = 'user'
         
+        logger.info(f"Пользователь зашел на страницу Контакты. логин: {user}")
         return templates_main.TemplateResponse(
             "contacts.html",
             {

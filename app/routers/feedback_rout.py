@@ -6,11 +6,14 @@ from app.routers.auth_rout import get_current_user
 from datetime import datetime
 from app.db.models.admin import admin_list
 from app.db.models.user import add_feedback_user, all_feedback_user, select_user_photo
+from app.utils.log import setup_logger
 
 router = APIRouter(
     prefix="",
-    tags=["Admin"]
+    tags=["Feedback"]
 )
+
+logger = setup_logger("Feedback")
 
 class FeedbackUser(BaseModel):
     text: str
@@ -40,6 +43,8 @@ async def feedback_get(request: Request, admin: int, user: dict = Depends(get_cu
         else:
             userP = "users/" + str(admin)
             admin_or_user = 'user'
+        
+        logger.info(f"Пользователь админ зашел на страницу отзывов. логин: {user}")
         
         return templates_main.TemplateResponse(
             "feedback.html",
@@ -71,6 +76,8 @@ async def feedback_get(request: Request, id_user: int, user: dict = Depends(get_
             userP = "users/" + str(id_user)
             admin_or_user = 'user'
         
+        logger.info(f"Пользователь user зашел на страницу отзывов. логин: {user}")
+        
         return templates_main.TemplateResponse(
             "feedback.html",
             {
@@ -88,10 +95,13 @@ async def feedback_get(request: Request, id_user: int, user: dict = Depends(get_
 async def feedback_download(data: FeedbackUser, user: dict = Depends(get_current_user)):
     
     if user:
+        logger.info(f"Пользователь загружает отзыв. логин: {user}. текст: {data.text}. рейтинг: {data.rating}")
         status = await add_feedback_user(user, data.text, data.rating, datetime.now().date())
         if status['status'] == 'No feedback':
+            logger.warning(f"Пользователь не может загрузить отзыв. логин: {user}. текст: {data.text}. рейтинг: {data.rating}")
             return JSONResponse(content={'status': False}, status_code=401)
         
+        logger.info(f"Пользователь успешно загрузил отзыв. логин: {user}. текст: {data.text}. рейтинг: {data.rating}")
         return JSONResponse(content={'status': True})
         
     else:
@@ -102,7 +112,7 @@ async def feedback_download(data: FeedbackUser, user: dict = Depends(get_current
 async def feedback_download(data: FeedbackFilter, user: dict = Depends(get_current_user)):
     
     if user:
-        
+        logger.info(f"Пользователь сделал запрос на получение всех отзывов. логин: {user}")
         all_feedback = await all_feedback_user()
         photo_user = await select_user_photo()
         
@@ -127,7 +137,8 @@ async def feedback_download(data: FeedbackFilter, user: dict = Depends(get_curre
                 'text': lf['text_feedback']
             }
             list_feedback.append(user_d)
-            
+        
+        logger.info(f"Запрос на получение всех отзывов выполнен. логин: {user}") 
         return JSONResponse(content={
             'feedback': list_feedback,
             'userId': user

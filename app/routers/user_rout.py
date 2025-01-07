@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse, Response
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 from app.routers.auth_rout import get_current_user
 from collections import namedtuple
@@ -13,6 +13,7 @@ from app.db.models.user import (update_name_user, update_telegram_user,
 from app.db.models.main_windows import windows_day_time, update_time_in_day
 from app.db.models.admin import admin_add_windows_day, admin_list
 from app.services.bot_notice import send_message_delete_user
+from app.utils.log import setup_logger
 
 import asyncio
 
@@ -21,6 +22,7 @@ router = APIRouter(
     tags=["User"]
 )
 
+logger = setup_logger("User")
 
 class UpdateUser(BaseModel):
     name: str
@@ -43,25 +45,33 @@ async def users_get(request: Request, users: int | None = None, user: dict = Dep
     
     if user:
         if user == users:
-            profile_user = await select_profile_user(users)
-            userP = "users/" + str(users)
-            id_user = users
-            name_user = profile_user['name']
-            tg_user = profile_user['telegram']
-            number_user = profile_user['telephone']
-
-            return templates_user.TemplateResponse(
-                "user.html",
-                {
-                    "request": request,
-                    "user": userP,
-                    "id_user": id_user,
-                    'name_user': name_user,
-                    'tg_user': tg_user,
-                    'number_user': number_user
-                }
-            )
+            try:
+                logger.info(f"Получение данных о пользователи. логин: {users}")
+                profile_user = await select_profile_user(users)
+                logger.info(f"Данные о пользователи: {profile_user}. логин: {users}")
+                
+                userP = "users/" + str(users)
+                id_user = users
+                name_user = profile_user['name']
+                tg_user = profile_user['telegram']
+                number_user = profile_user['telephone']
+                
+                logger.info(f"Пользователь успешно зашел к себе в профиль. логин: {user}")
+                return templates_user.TemplateResponse(
+                    "user.html",
+                    {
+                        "request": request,
+                        "user": userP,
+                        "id_user": id_user,
+                        'name_user': name_user,
+                        'tg_user': tg_user,
+                        'number_user': number_user
+                    }
+                )
+            except:
+                logger.warning(f"Ошибка получения данных о пользователи. логин: {user}")
         else:
+            logger.warning(f"Пользователь попытался войти на неправильный адрес {users}. логин: {user}")
             return templates_main.TemplateResponse("error.html", {"request": request})
     
     else:
@@ -73,15 +83,18 @@ async def update_users_post(request: Request, data_user: UpdateUser, users: int 
     
     if user:
         if user == users:
-            
+            logger.info(f"Пользователь отправил изменения профиля: {data_user.name}. логин: {user}")
             if data_user.name == 'userName':
                 asyncio.create_task(update_name_user(data_user.update_name, users))
-            
+                logger.info(f"Запрос на изменения userName отправлен. логин: {user}")
+                
             elif data_user.name == 'userTg':
                 asyncio.create_task(update_telegram_user(data_user.update_name, users))
+                logger.info(f"Запрос на изменения userTg отправлен. логин: {user}")
                 
             elif data_user.name == 'userPhone':
                 asyncio.create_task(update_telephone_user(data_user.update_name, users))
+                logger.info(f"Запрос на изменения userPhone отправлен. логин: {user}")
             
             return JSONResponse(content={'status': True})
     
@@ -101,8 +114,12 @@ async def record_user_post(request: Request, data: RecordUser, user: dict = Depe
         if user != data.userId:
             return JSONResponse(content={'status': False}, status_code=403)
 
+        logger.info(f"Получение записей пользователя. логин: {user}")
         data_user_record = await select_record_user(data.userId)
+        logger.info(f"Записи пользователя {data_user_record}. логин: {user}")
+        
         if not data_user_record:
+            logger.info(f"У пользоватя отсутствуют записи. логин: {user}")
             return JSONResponse(content={'status': False})
         
         data_list = [
@@ -114,7 +131,7 @@ async def record_user_post(request: Request, data: RecordUser, user: dict = Depe
             }
             for dur in data_user_record
         ]
-        
+        logger.info(f"Успешная загрузка записей пользователя. логин: {user}")
         return JSONResponse(content={'status': True, 'data': data_list})
     except Exception as e:
         print(f"Ошибка в обработке записи пользователя: {e}")
@@ -146,6 +163,8 @@ async def delete_record_post(request: Request, data_delete: DeleteRecordUser, us
         time_r = datetime.strptime(data.time, '%H:%M')
         date_full = datetime.combine(date_r, time_r.time()).isoformat()
         
+        logger.info(f"Пользователь отправил запрос на удаление записи {data_delete}. логин: {user}")
+        
         if date_r > date_today:
         
             if await delete_record_user(int(data.id), date_r, date_full):
@@ -167,9 +186,11 @@ async def delete_record_post(request: Request, data_delete: DeleteRecordUser, us
                 
                 await count_del_visits(int(data.id))
                 
+                logger.info(f"Пользователь успешно удалил запись {data_delete}. логин: {user}")
                 return JSONResponse(content={'status': True})
         
         else:
+            logger.warning(f"Пользователю запрещено удаление записи {data_delete}. логин: {user}")
             return JSONResponse(content={'status': False}, status_code=403)
     except Exception as e:
         print(f"Ошибка в обработке записи пользователя: {e}")

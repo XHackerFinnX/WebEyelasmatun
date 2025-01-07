@@ -3,7 +3,10 @@ from app.services.bot_notice import send_message_record, send_message_record_adm
 from app.db.models.user import (update_status_record_user, profile_record_user,
                                 last_record_user, update_profile_last_record_user,
                                 check_record_user_before_notification, count_add_visits)
+from app.utils.log import setup_logger
 import asyncio
+
+logger = setup_logger("Push")
 
 async def push_sms(id_user, date):
     
@@ -99,6 +102,9 @@ async def push_sms_technic(id_user, date):
     date_r = date.date()
     time_r = date.isoformat()
     date_today = datetime.now()
+    
+    logger.info(f'Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+    
     if date_today.date() == date.date():
         counting_down = date - date_today - timedelta(hours=1)
         if counting_down.seconds < 0:
@@ -115,6 +121,7 @@ async def push_sms_technic(id_user, date):
             
             # Добавляется +1 к посещению
             await count_add_visits(id_user)
+            logger.info(f'Запись прошла. Логин: {id_user} Дата записи: {date}')
         else:
             
             # Проверка. Есть ли запись у клиента
@@ -134,6 +141,8 @@ async def push_sms_technic(id_user, date):
             
             # Добавляется +1 к посещению
             await count_add_visits(id_user)
+            
+            logger.info(f'Уведомления о записи прошло. Логин: {id_user} Дата записи: {date}')
         
     elif date_today.date() == date.date() - timedelta(days=1):
         counting_down = date - date_today - timedelta(hours=1)
@@ -156,6 +165,8 @@ async def push_sms_technic(id_user, date):
         
         # Добавляется +1 к посещению
         await count_add_visits(id_user)
+        
+        logger.info(f'Уведомления о записи прошло. Логин: {id_user} Дата записи: {date}')
         
     elif date_today.date() < date.date():
         counting_down = date - date_today - timedelta(days=1)
@@ -183,6 +194,8 @@ async def push_sms_technic(id_user, date):
         
         # Добавляется +1 к посещению
         await count_add_visits(id_user)
+        
+        logger.info(f'Уведомления о записи прошло. Логин: {id_user} Дата записи: {date}')
         
     return
         

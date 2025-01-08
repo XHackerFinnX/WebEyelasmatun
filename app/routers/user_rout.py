@@ -14,6 +14,7 @@ from app.db.models.main_windows import windows_day_time, update_time_in_day
 from app.db.models.admin import admin_add_windows_day, admin_list
 from app.services.bot_notice import send_message_delete_user
 from app.utils.log import setup_logger
+from zoneinfo import ZoneInfo
 
 import asyncio
 
@@ -23,6 +24,7 @@ router = APIRouter(
 )
 
 logger = setup_logger("User")
+piter_tz = ZoneInfo("Europe/Moscow")
 
 class UpdateUser(BaseModel):
     name: str
@@ -158,7 +160,7 @@ async def delete_record_post(request: Request, data_delete: DeleteRecordUser, us
         if user != int(data.id):
             return JSONResponse(content={'status': False}, status_code=403)
         
-        date_today = datetime.now() + timedelta(days=3)
+        date_today = datetime.now(piter_tz).replace(tzinfo=None) + timedelta(days=3)
         date_r = datetime.strptime(data.date, "%d.%m.%Y")
         time_r = datetime.strptime(data.time, '%H:%M')
         date_full = datetime.combine(date_r, time_r.time()).isoformat()

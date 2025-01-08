@@ -37,12 +37,12 @@ async def post_login(request: Request, data: LoginData):
     logger.info(f"Получение статуса ЧС пользователя {data.username} из status_authentication {black_list_status}")
 
     if black_list_status is None:
-        await update_authentication(data.username, False, datetime.now(piter_tz))
+        await update_authentication(data.username, False, datetime.now(piter_tz).replace(tzinfo=None))
         logger.warning(f"Пользователь неверно ввел имя или пароль. логин: {data.username} пароль: {data.password}")
         raise HTTPException(status_code=401, detail="Неверное имя пользователя или пароль")
         
     if black_list_status['blacklist']:
-        await update_authentication(data.username, False, datetime.now(piter_tz))
+        await update_authentication(data.username, False, datetime.now(piter_tz).replace(tzinfo=None))
         logger.warning(f"Пользователь заблокирован. логин: {data.username}")
         raise HTTPException(status_code=401, detail="Вы заблокированы")
     
@@ -51,7 +51,7 @@ async def post_login(request: Request, data: LoginData):
         
         # Обновление статуса, что пользователь не смог войти на сайт.
         # Также время когда он не смог зайти
-        await update_authentication(data.username, False, datetime.now(piter_tz))
+        await update_authentication(data.username, False, datetime.now(piter_tz).replace(tzinfo=None))
         
     else:
         dict_user = {
@@ -61,7 +61,7 @@ async def post_login(request: Request, data: LoginData):
         # Обновление статуса, что пользователь вошел и находится на сайте.
         # Также время когда он зашел
         logger.info(f"Пользователь успешно авторизовался. логин: {data.username}")
-        await update_authentication(data.username, True, datetime.now(piter_tz))
+        await update_authentication(data.username, True, datetime.now(piter_tz).replace(tzinfo=None))
         
     if dict_user:
         request.session.update(dict_user) # Создание сессии
@@ -87,7 +87,7 @@ async def logout(request: Request):
     # Обновление статуса, что пользователь вышел из сайта.
     # Также время когда он вышел
     logger.info(f"Пользователь вышел из сайта. логин: {user}")
-    await update_authentication(user, False, datetime.now())
+    await update_authentication(user, False, datetime.now(piter_tz).replace(tzinfo=None))
     
     return JSONResponse(content={'status': True})
     

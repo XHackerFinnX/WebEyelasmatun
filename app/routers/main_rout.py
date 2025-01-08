@@ -101,7 +101,7 @@ async def main_get(request: Request, user: dict = Depends(get_current_user)):
 async def date_record(tod: ToDay, user: dict = Depends(get_current_user)):
     
     dates = [(d['date'] - timedelta(days=1)).strftime("%Y-%m-%d") for d in await windows_day()]
-    date_today = datetime.now(piter_tz)
+    date_today = datetime.now(piter_tz).replace(tzinfo=None)
     
     asyncio.create_task(update_last_visit_user(date_today, user))
     
@@ -128,7 +128,7 @@ async def record_post(request: Request, data_record: RecordUser, user: dict = De
         
         await asyncio.sleep(3)
         
-        date_today = datetime.now(piter_tz)
+        date_today = datetime.now(piter_tz).replace(tzinfo=None)
         date_minus_hours_3 = date_full - timedelta(hours=3)
 
         logger.info(f'Дата записи {date_full}, дата сегодня {date_today}, дата -3 часа {date_minus_hours_3}. логин: {user}')

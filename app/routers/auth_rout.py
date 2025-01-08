@@ -6,6 +6,7 @@ from app.db.models.auth import (user_check_authentication, update_authentication
                             status_authentication, synchronic_status_authentication)
 from datetime import datetime
 from app.utils.log import setup_logger
+from zoneinfo import ZoneInfo
 
 router = APIRouter(
     prefix="",
@@ -13,6 +14,7 @@ router = APIRouter(
 )
 
 logger = setup_logger("Auth")
+piter_tz = ZoneInfo("Europe/Moscow")
 
 templates = Jinja2Templates(directory=r"./app/templates/auth")
 
@@ -35,12 +37,12 @@ async def post_login(request: Request, data: LoginData):
     logger.info(f"Получение статуса ЧС пользователя {data.username} из status_authentication {black_list_status}")
 
     if black_list_status is None:
-        await update_authentication(data.username, False, datetime.now())
+        await update_authentication(data.username, False, datetime.now(piter_tz))
         logger.warning(f"Пользователь неверно ввел имя или пароль. логин: {data.username} пароль: {data.password}")
         raise HTTPException(status_code=401, detail="Неверное имя пользователя или пароль")
         
     if black_list_status['blacklist']:
-        await update_authentication(data.username, False, datetime.now())
+        await update_authentication(data.username, False, datetime.now(piter_tz))
         logger.warning(f"Пользователь заблокирован. логин: {data.username}")
         raise HTTPException(status_code=401, detail="Вы заблокированы")
     
@@ -49,7 +51,7 @@ async def post_login(request: Request, data: LoginData):
         
         # Обновление статуса, что пользователь не смог войти на сайт.
         # Также время когда он не смог зайти
-        await update_authentication(data.username, False, datetime.now())
+        await update_authentication(data.username, False, datetime.now(piter_tz))
         
     else:
         dict_user = {
@@ -59,7 +61,7 @@ async def post_login(request: Request, data: LoginData):
         # Обновление статуса, что пользователь вошел и находится на сайте.
         # Также время когда он зашел
         logger.info(f"Пользователь успешно авторизовался. логин: {data.username}")
-        await update_authentication(data.username, True, datetime.now())
+        await update_authentication(data.username, True, datetime.now(piter_tz))
         
     if dict_user:
         request.session.update(dict_user) # Создание сессии

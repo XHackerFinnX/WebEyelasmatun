@@ -7,6 +7,7 @@ from datetime import datetime
 from app.db.models.admin import admin_list
 from app.db.models.user import add_feedback_user, all_feedback_user, select_user_photo
 from app.utils.log import setup_logger
+from zoneinfo import ZoneInfo
 
 router = APIRouter(
     prefix="",
@@ -14,6 +15,7 @@ router = APIRouter(
 )
 
 logger = setup_logger("Feedback")
+piter_tz = ZoneInfo("Europe/Moscow")
 
 class FeedbackUser(BaseModel):
     text: str
@@ -96,7 +98,7 @@ async def feedback_download(data: FeedbackUser, user: dict = Depends(get_current
     
     if user:
         logger.info(f"Пользователь загружает отзыв. логин: {user}. текст: {data.text}. рейтинг: {data.rating}")
-        status = await add_feedback_user(user, data.text, data.rating, datetime.now().date())
+        status = await add_feedback_user(user, data.text, data.rating, datetime.now(piter_tz).date())
         if status['status'] == 'No feedback':
             logger.warning(f"Пользователь не может загрузить отзыв. логин: {user}. текст: {data.text}. рейтинг: {data.rating}")
             return JSONResponse(content={'status': False}, status_code=401)

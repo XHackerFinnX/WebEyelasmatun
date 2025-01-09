@@ -16,7 +16,7 @@ async def push_sms(id_user, date):
     
     user_info = await profile_record_user(id_user)
     admin_group = -1002034439978
-    text_admin = f"ID: {user_info[0]['id']}\nКлиент: {user_info[0]['name']}\nТелеграмм: {user_info[0]['telegram']}\nВремя: {date.strftime('%d.%m.%Y %H:%M')}"
+    text_admin = f"ID: {user_info[0]['id']}\nКлиент: {user_info[0]['name'].replace('#', '-')}\nТелеграмм: {user_info[0]['telegram'].replace('#', '-')}\nВремя: {date.strftime('%d.%m.%Y %H:%M')}"
     await send_message_record_admin(admin_group, text_admin)
     
     date_r = date.date()
@@ -37,7 +37,7 @@ async def push_sms(id_user, date):
                 
         logger.info(f'Уведомления 1 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         
-        await asyncio.sleep(counting_down.seconds)
+        await asyncio.sleep(total_seconds)
         
         # Проверка. Есть ли запись у клиента
         status = await check_record_user_before_notification(id_user, date_r, time_r)
@@ -69,7 +69,7 @@ async def push_sms(id_user, date):
         
         logger.info(f'Уведомления 2 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         
-        await asyncio.sleep(counting_down.seconds)
+        await asyncio.sleep(total_seconds)
         
         # Проверка. Есть ли запись у клиента
         status = await check_record_user_before_notification(id_user, date_r, time_r)
@@ -100,7 +100,7 @@ async def push_sms(id_user, date):
         minutes, _ = divmod(remaining_seconds, 60)
         
         logger.info(f'Уведомления 3.1 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
-        await asyncio.sleep(counting_down.seconds)
+        await asyncio.sleep(total_seconds)
         await send_message_record(id_user, text)
         
         logger.info(f'Уведомления 3.1 о записи прошло. Логин: {id_user} Дата записи: {date}')
@@ -114,7 +114,7 @@ async def push_sms(id_user, date):
         minutes, _ = divmod(remaining_seconds, 60)
         
         logger.info(f'Уведомления 3.2 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
-        await asyncio.sleep(counting_down.seconds)
+        await asyncio.sleep(total_seconds)
         
         # Проверка. Есть ли запись у клиента
         status = await check_record_user_before_notification(id_user, date_r, time_r)
@@ -181,7 +181,7 @@ async def push_sms_technic(id_user, date):
             minutes, _ = divmod(remaining_seconds, 60)
             
             logger.info(f'Уведомления 1 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
-            await asyncio.sleep(counting_down.seconds)
+            await asyncio.sleep(total_seconds)
             # Отправка уведомления
             await send_message_record(id_user, text)
             
@@ -206,7 +206,7 @@ async def push_sms_technic(id_user, date):
         minutes, _ = divmod(remaining_seconds, 60)
         
         logger.info(f'Уведомления 2 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
-        await asyncio.sleep(counting_down.seconds)
+        await asyncio.sleep(total_seconds)
         
         # Проверка. Есть ли запись у клиента
         status = await check_record_user_before_notification(id_user, date_r, time_r)
@@ -237,7 +237,7 @@ async def push_sms_technic(id_user, date):
         minutes, _ = divmod(remaining_seconds, 60)
         
         logger.info(f'Уведомления 3.1 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
-        await asyncio.sleep(counting_down.seconds)
+        await asyncio.sleep(total_seconds)
         await send_message_record(id_user, text)
         
         logger.info(f'Уведомления 3.1 о записи прошло. Логин: {id_user} Дата записи: {date}')
@@ -251,7 +251,7 @@ async def push_sms_technic(id_user, date):
         minutes, _ = divmod(remaining_seconds, 60)
         
         logger.info(f'Уведомления 3.2 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
-        await asyncio.sleep(counting_down.seconds)
+        await asyncio.sleep(total_seconds)
         
         # Проверка. Есть ли запись у клиента
         status = await check_record_user_before_notification(id_user, date_r, time_r)

@@ -120,13 +120,13 @@ async def time_record(timeday: TimeDay):
 async def record_post(request: Request, data_record: RecordUser, user: dict = Depends(get_current_user)):
     
     if user:
-        logger.info(f"Пользователь отправил запрос на запись {data_record}. логин: {user}")
         date_r = datetime.strptime(data_record.date, '%Y-%m-%d') + timedelta(days=1)
         time_r = datetime.strptime(data_record.time, '%H:%M')
         date_full = datetime.combine(date_r, time_r.time())
         comment_r = data_record.comment or '-'
+        logger.info(f"Пользователь отправил запрос на запись {date_full}. логин: {user}")
         
-        await asyncio.sleep(3)
+        await asyncio.sleep(1)
         
         date_today = datetime.now(piter_tz).replace(tzinfo=None)
         date_minus_hours_3 = date_full - timedelta(hours=3)
@@ -140,16 +140,22 @@ async def record_post(request: Request, data_record: RecordUser, user: dict = De
             return JSONResponse(content={"success": False})
         
         try:
+            await asyncio.sleep(1)
             logger.info(f'Проверка окошки для записи. логин: {user}')
             if await check_record_time(user, date_r, date_full) is None:
+                logger.info(f'Окошко свободно. логин: {user}')
+                
                 logger.info(f'Добавление записи пользователя. логин: {user}')
+                await asyncio.sleep(1)
                 await add_record_user(user, date_r, date_full, comment_r, True)
+                logger.info(f'Пользователь записан. логин: {user}')
                 
                 time_list: list = await select_day_time(date_r)
                 
                 for t in time_list:
                     if t == data_record.time:
                         time_list.remove(t)
+                        logger.info(f'Удаление окошка {date_r} {data_record.time}. логин: {user}')
                         await update_windows_day(date_r, time_list)
                         
                 if not time_list:

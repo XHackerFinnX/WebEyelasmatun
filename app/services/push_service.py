@@ -25,7 +25,7 @@ async def push_sms(id_user, date):
     date_today = datetime.now(piter_tz)
     date = date.replace(tzinfo=piter_tz)
     
-    logger.info(f'Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+    # logger.info(f'Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
     
     if date_today.date() == date.date():
         counting_down = date - date_today - timedelta(hours=1)
@@ -149,7 +149,7 @@ async def push_sms_technic(id_user, date):
     date_today = datetime.now(piter_tz)
     date = date.replace(tzinfo=piter_tz)
     
-    logger.info(f'Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
+    # logger.info(f'Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
     
     if date_today.date() == date.date():
         counting_down = date - date_today - timedelta(hours=1)

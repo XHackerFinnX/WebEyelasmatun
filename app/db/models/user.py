@@ -127,12 +127,12 @@ async def check_record_time(id_user: int, date, time):
     query = """
     SELECT id
     FROM record_user
-    WHERE id = $1 AND date = $2 AND time = $3
+    WHERE date = $1 AND time = $2
     """
     try:
         pool = await User.connect()
         async with pool.acquire() as conn:
-            check_time = await conn.fetch(query, id_user, date, time.isoformat())
+            check_time = await conn.fetch(query, date, time.isoformat())
 
             return check_time if check_time else None
     except Exception as error:

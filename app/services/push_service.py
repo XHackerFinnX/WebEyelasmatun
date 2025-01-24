@@ -12,6 +12,8 @@ logger = setup_logger("Push")
 async def push_sms(id_user, date):
     
     text = f"Напоминаю {date.strftime('%d.%m.%Y %H:%M')}\nЗапись к Eyelasmatun"
+    text_feedback = 'Пожалуйста, оставьте ваш отзыв о проделанной работе на нашем сайте в разделе «Отзывы». Ваше мнение очень важно для нас!'
+    TOTAL_SECONDS_DO_FEEDBACK = 9000
     await send_message_record(id_user, text)
     
     user_info = await profile_record_user(id_user)
@@ -24,8 +26,6 @@ async def push_sms(id_user, date):
     piter_tz = ZoneInfo("Europe/Moscow")
     date_today = datetime.now(piter_tz)
     date = date.replace(tzinfo=piter_tz)
-    
-    # logger.info(f'Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
     
     if date_today.date() == date.date():
         counting_down = date - date_today - timedelta(hours=1)
@@ -46,6 +46,16 @@ async def push_sms(id_user, date):
 
         # Отправка уведомления
         await send_message_record(id_user, text)
+        
+        await asyncio.sleep(TOTAL_SECONDS_DO_FEEDBACK)
+        
+        # Проверка. Есть ли запись у клиента
+        status = await check_record_user_before_notification(id_user, date_r, time_r)
+        if not status:
+            return
+        
+        # Отправка уведомления, чтобы оставили отзыв
+        await send_message_record(id_user, text_feedback)
         
         #Обновление статуса - запись завершена
         await update_status_record_user(id_user, date_r, time_r)
@@ -79,6 +89,16 @@ async def push_sms(id_user, date):
         # Отправка уведомления
         await send_message_record(id_user, text)
         
+        await asyncio.sleep(TOTAL_SECONDS_DO_FEEDBACK)
+        
+        # Проверка. Есть ли запись у клиента
+        status = await check_record_user_before_notification(id_user, date_r, time_r)
+        if not status:
+            return
+        
+        # Отправка уведомления, чтобы оставили отзыв
+        await send_message_record(id_user, text_feedback)
+        
         #Обновление статуса - запись завершена
         await update_status_record_user(id_user, date_r, time_r)
         
@@ -130,6 +150,16 @@ async def push_sms(id_user, date):
         # Отправка уведомления
         await send_message_record(id_user, text)
         
+        await asyncio.sleep(TOTAL_SECONDS_DO_FEEDBACK)
+        
+        # Проверка. Есть ли запись у клиента
+        status = await check_record_user_before_notification(id_user, date_r, time_r)
+        if not status:
+            return
+        
+        # Отправка уведомления, чтобы оставили отзыв
+        await send_message_record(id_user, text_feedback)
+        
         #Обновление статуса - запись завершена
         await update_status_record_user(id_user, date_r, time_r)
         
@@ -148,6 +178,8 @@ async def push_sms(id_user, date):
 async def push_sms_technic(id_user, date):
     
     text = f"Напоминаю {date.strftime('%d.%m.%Y %H:%M')}\nЗапись к Eyelasmatun"
+    text_feedback = 'Пожалуйста, оставьте ваш отзыв о проделанной работе на нашем сайте в разделе «Отзывы». Ваше мнение очень важно для нас!'
+    TOTAL_SECONDS_DO_FEEDBACK = 9000
     
     date_r = date.date()
     time_r = date.isoformat()
@@ -161,8 +193,23 @@ async def push_sms_technic(id_user, date):
         counting_down = date - date_today - timedelta(hours=1)
         if counting_down.seconds < 0:
             
+            # Проверка. Есть ли запись у клиента
+            status = await check_record_user_before_notification(id_user, date_r, time_r)
+            if not status:
+                return
+            
             # Отправка уведомления
             await send_message_record(id_user, text)
+            
+            await asyncio.sleep(TOTAL_SECONDS_DO_FEEDBACK)
+        
+            # Проверка. Есть ли запись у клиента
+            status = await check_record_user_before_notification(id_user, date_r, time_r)
+            if not status:
+                return
+            
+            # Отправка уведомления, чтобы оставили отзыв
+            await send_message_record(id_user, text_feedback)
             
             #Обновление статуса - запись завершена
             await update_status_record_user(id_user, date_r, time_r)
@@ -190,6 +237,16 @@ async def push_sms_technic(id_user, date):
             await asyncio.sleep(total_seconds)
             # Отправка уведомления
             await send_message_record(id_user, text)
+            
+            await asyncio.sleep(TOTAL_SECONDS_DO_FEEDBACK)
+        
+            # Проверка. Есть ли запись у клиента
+            status = await check_record_user_before_notification(id_user, date_r, time_r)
+            if not status:
+                return
+            
+            # Отправка уведомления, чтобы оставили отзыв
+            await send_message_record(id_user, text_feedback)
             
             #Обновление статуса - запись завершена
             await update_status_record_user(id_user, date_r, time_r)
@@ -222,6 +279,16 @@ async def push_sms_technic(id_user, date):
         # Отправка уведомления
         await send_message_record(id_user, text)
         
+        await asyncio.sleep(TOTAL_SECONDS_DO_FEEDBACK)
+        
+        # Проверка. Есть ли запись у клиента
+        status = await check_record_user_before_notification(id_user, date_r, time_r)
+        if not status:
+            return
+        
+        # Отправка уведомления, чтобы оставили отзыв
+        await send_message_record(id_user, text_feedback)
+        
         #Обновление статуса - запись завершена
         await update_status_record_user(id_user, date_r, time_r)
         
@@ -272,6 +339,16 @@ async def push_sms_technic(id_user, date):
 
         # Отправка уведомления
         await send_message_record(id_user, text)
+        
+        await asyncio.sleep(TOTAL_SECONDS_DO_FEEDBACK)
+        
+        # Проверка. Есть ли запись у клиента
+        status = await check_record_user_before_notification(id_user, date_r, time_r)
+        if not status:
+            return
+        
+        # Отправка уведомления, чтобы оставили отзыв
+        await send_message_record(id_user, text_feedback)
         
         #Обновление статуса - запись завершена
         await update_status_record_user(id_user, date_r, time_r)

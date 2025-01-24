@@ -101,6 +101,12 @@ async def push_sms(id_user, date):
         
         logger.info(f'Уведомления 3.1 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(total_seconds)
+        
+        # Проверка. Есть ли запись у клиента
+        status = await check_record_user_before_notification(id_user, date_r, time_r)
+        if not status:
+            return
+        
         await send_message_record(id_user, text)
         
         logger.info(f'Уведомления 3.1 о записи прошло. Логин: {id_user} Дата записи: {date}')
@@ -238,6 +244,12 @@ async def push_sms_technic(id_user, date):
         
         logger.info(f'Уведомления 3.1 запущено. Завершено будет через {days} дней, {hours} часов, {minutes} минут. Логин: {id_user} Дата записи: {date} Дата сегодня: {date_today}')
         await asyncio.sleep(total_seconds)
+        
+        # Проверка. Есть ли запись у клиента
+        status = await check_record_user_before_notification(id_user, date_r, time_r)
+        if not status:
+            return
+        
         await send_message_record(id_user, text)
         
         logger.info(f'Уведомления 3.1 о записи прошло. Логин: {id_user} Дата записи: {date}')

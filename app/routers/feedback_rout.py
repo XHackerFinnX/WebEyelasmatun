@@ -6,6 +6,7 @@ from app.routers.auth_rout import get_current_user
 from datetime import datetime
 from app.db.models.admin import admin_list
 from app.db.models.user import add_feedback_user, all_feedback_user, select_user_photo
+from app.services.bot_notice import send_message_record_admin
 from app.utils.log import setup_logger
 from zoneinfo import ZoneInfo
 
@@ -96,6 +97,9 @@ async def feedback_get(request: Request, id_user: int, user: dict = Depends(get_
 @router.post('/api/feedback/download')
 async def feedback_download(data: FeedbackUser, user: dict = Depends(get_current_user)):
     
+    admin_group = -1002034439978
+    text_feedback = 'Клиент оставил отзыв!'
+    
     if user:
         logger.info(f"Пользователь загружает отзыв. логин: {user}. текст: {data.text}. рейтинг: {data.rating}")
         status = await add_feedback_user(user, data.text, data.rating, datetime.now(piter_tz).date())
@@ -103,6 +107,7 @@ async def feedback_download(data: FeedbackUser, user: dict = Depends(get_current
             logger.warning(f"Пользователь не может загрузить отзыв. логин: {user}. текст: {data.text}. рейтинг: {data.rating}")
             return JSONResponse(content={'status': False}, status_code=401)
         
+        await send_message_record_admin(admin_group, text_feedback)
         logger.info(f"Пользователь успешно загрузил отзыв. логин: {user}. текст: {data.text}. рейтинг: {data.rating}")
         return JSONResponse(content={'status': True})
         

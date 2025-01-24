@@ -27,6 +27,7 @@ router = APIRouter(
 
 logger = setup_logger("Main")
 piter_tz = ZoneInfo("Europe/Moscow")
+record_mutex = asyncio.Lock()
 
 class RecordUser(BaseModel):
     date: str
@@ -139,38 +140,37 @@ async def record_post(request: Request, data_record: RecordUser, user: dict = De
         if date_today > date_minus_hours_3:
             return JSONResponse(content={"success": False})
         
-        try:
-            await asyncio.sleep(1)
-            logger.info(f'Проверка окошки для записи. логин: {user}')
-            if await check_record_time(user, date_r, date_full) is None:
-                logger.info(f'Окошко свободно. логин: {user}')
-                
-                logger.info(f'Добавление записи пользователя. логин: {user}')
-                await asyncio.sleep(1)
-                await add_record_user(user, date_r, date_full, comment_r, True)
-                logger.info(f'Пользователь записан. логин: {user}')
-                
-                time_list: list = await select_day_time(date_r)
-                
-                for t in time_list:
-                    if t == data_record.time:
-                        time_list.remove(t)
-                        logger.info(f'Удаление окошка {date_r} {data_record.time}. логин: {user}')
-                        await update_windows_day(date_r, time_list)
-                        
-                if not time_list:
-                    await admin_delete_windows_day(date_r)
+        async with record_mutex:
+            try:
+                logger.info(f'Проверка окошки для записи. логин: {user}')
+                if await check_record_time(user, date_r, date_full) is None:
+                    logger.info(f'Окошко свободно. логин: {user}')
                     
-                asyncio.create_task(push_sms(user, date_full))
-                
-                logger.info(f'Отправка уведомления и успешная запись. логин: {user}')
-                return JSONResponse(content={"success": True})
-            else:
-                logger.warning(f'Окошка для записи нет. логин: {user}')
+                    logger.info(f'Добавление записи пользователя. логин: {user}')
+                    await add_record_user(user, date_r, date_full, comment_r, True)
+                    logger.info(f'Пользователь записан. логин: {user}')
+                    
+                    time_list: list = await select_day_time(date_r)
+                    
+                    for t in time_list:
+                        if t == data_record.time:
+                            time_list.remove(t)
+                            logger.info(f'Удаление окошка {date_r} {data_record.time}. логин: {user}')
+                            await update_windows_day(date_r, time_list)
+                            
+                    if not time_list:
+                        await admin_delete_windows_day(date_r)
+                        
+                    asyncio.create_task(push_sms(user, date_full))
+                    
+                    logger.info(f'Отправка уведомления и успешная запись. логин: {user}')
+                    return JSONResponse(content={"success": True})
+                else:
+                    logger.warning(f'Окошка для записи нет. логин: {user}')
+                    return JSONResponse(content={"success": False})
+            except:
+                logger.error(f'Ошибка записи на время {data_record}. логин: {user}')
                 return JSONResponse(content={"success": False})
-        except:
-            logger.error(f'Ошибка записи на время {data_record}. логин: {user}')
-            return JSONResponse(content={"success": False})
         
     else:
         return templates_auth.TemplateResponse("auth.html", {"request": request})
